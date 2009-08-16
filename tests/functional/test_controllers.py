@@ -2,7 +2,7 @@
 import yaml
 import cherrypy
 from os.path import dirname, abspath, join
-from hacklab.controllers import HelloWorldController
+from hacklab.controllers import HackLab
 from sponge.core import ConfigValidator, SpongeConfig
 
 current_dir = abspath(dirname(__file__))
@@ -12,11 +12,15 @@ yml = yaml.load(open(settings_path).read())
 
 SpongeConfig(cherrypy.config, ConfigValidator(yml)).setup_all(root_dir)
 
-class TestHelloWorldController:
-    def test_index_renders_some_congratulations(self):
-        ctrl = HelloWorldController()
+class TestHackLab:
+    def test_index_renders_proper_javascript_includes(self):
+        ctrl = HackLab()
         html = ctrl.index()
 
-        assert 'Congratulations!' in html, "The html rendered by " \
-               "HelloWorldController's should have some " \
-               "congratulation message."
+        expected = '<script src="/media/js/jquery.js" type="text/javascript"></script>\n' \
+           '    <script src="/media/js/jquery.ui.js" type="text/javascript"></script>\n' \
+           '    <script src="/media/js/jquery.lowpro.js" type="text/javascript"></script>\n' \
+           '    <script src="/media/js/hacklab.js" type="text/javascript"></script>\n' \
+           '    <script src="/media/js/hacklab.base.js" type="text/javascript"></script>'
+
+        assert expected in html

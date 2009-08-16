@@ -18,43 +18,13 @@
 import cherrypy
 import startup
 
-from datetime import datetime
 from sponge import route
 from sponge import Controller
 from sponge import template
 
 startup.startup()
 
-AVAILABLE_FORMATS = {
-    'date': '%Y-%m-%d',
-    'time': '%H:%M:%S',
-    'date_and_time': '%Y-%m-%d - %H:%M:%S',
-}
-
-INVALID_FORMAT_STRING = 'invalid format, should be in: %s'
-TIME_JSON = '{"time": "%s"}'
-
-class AjaxController(Controller):
-    @route('/current_:kind', name='ajax_time')
-    def get_ajax_time(self, kind):
-        now = datetime.now()
-        kind = kind.lower()
-        if kind not in AVAILABLE_FORMATS:
-            cherrypy.response.status = 400
-            return INVALID_FORMAT_STRING % ", ".join(AVAILABLE_FORMATS.keys())
-
-        chosen = AVAILABLE_FORMATS[kind]
-        formatted = now.strftime(chosen)
-        return TIME_JSON % formatted
-
-class HelloWorldController(Controller):
-    @route('/', 'hello_index')
+class HackLab(Controller):
+    @route('/')
     def index(self):
         return template.render_html('index.html')
-
-    @route('/:what', 'hello_custom')
-    def custom_page(self, what):
-        if what.lower() not in ('work', 'play'):
-            return 'Invalid action: %s' % what
-
-        return template.render_html('custom.html', {'action': what})

@@ -1,7 +1,6 @@
 application:
   classes:
-    AjaxController: /ajax
-    HelloWorldController: /
+    HackLab: /
   image-dir: media/img
   path: hacklab/controllers.py
   static:

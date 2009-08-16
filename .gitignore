@@ -2,3 +2,4 @@
 repositories/*
 *~
 gitdaemon.pid
+.coverage
