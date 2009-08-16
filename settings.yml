@@ -1,0 +1,13 @@
+application:
+  classes:
+    AjaxController: /ajax
+    HelloWorldController: /
+  image-dir: media/img
+  path: hacklab/controllers.py
+  static:
+    /media: media
+  template-dir: templates
+autoreload: true
+host: 0.0.0.0
+port: 4000
+run-as: wsgi
