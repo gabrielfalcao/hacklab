@@ -9,49 +9,22 @@
     <link rel="stylesheet" href="/media/css/main.css" />
     <script src="/media/js/jquery.js" type="text/javascript"></script>
     <script src="/media/js/jquery.ui.js" type="text/javascript"></script>
+    <script src="/media/js/jquery.lowpro.js" type="text/javascript"></script>
+    <script src="/media/js/hacklab.js" type="text/javascript"></script>
+    <script src="/media/js/hacklab.base.js" type="text/javascript"></script>
     <script type="text/javascript">
-        $(document).ready(function(){
-            $("#date-controls .datelink").click(function(){
-                var where = $(this).attr("href");
-                $.ajax({
-                    url: where,
-                    dataType: "json",
-                    success: function (data) {
-                        $("#current-time").text(data.time)
-                    },
-                    error: function (xhr) {
-                        $("#current-time").text(xhr.responseText);
-                    }
-                });
-                return false;
-            });
-        });
+      $(document).ready(function (){
+          $.hacklab.go();
+      });
     </script>
 </head>
 <body>
-<div class="container_12">
-    <div class="grid_1">
-        <div class="grid_3 alpha">
-            <img src="/media/img/sponge.png" alt="Sponge, getting things DRY" />
-        </div>
-        <div class="grid_9 omega">
-            <h1>Congratulations!</h1>
-
-            <h2>Your have just <em>Sponged</em> a new web application!</h2>
-            <h3>You can even play with routes!</h3>
-            <ul>
-                <li><a href="/play">Play</a></li>
-                <li><a href="/work">Work</a></li>
-            </ul>
-            <h3>On Sponge, nice routes meets ajax</h3>
-            <ul id="date-controls">
-                <li><a class="datelink" href="/ajax/current_date">Date</a></li>
-                <li><a class="datelink" href="/ajax/current_time">Time</a></li>
-                <li><a class="datelink" href="/ajax/current_date_and_time">Date and Time</a></li>
-                <li><a class="datelink" href="/ajax/current_blabla">Unrecognized format</a></li>
-            </ul>
-            <h4 id="current-time">Choose the time format above</h4>
-        </div>
+<div class="container_16">
+    <div id="top" class="grid_3">
+	<img src="/media/img/logo.png" class="logo" alt="HackLab logo" />
+    </div>
+    <div id="top-search" class="grid_4 prefix_1">
+	<input type="text" class="textbox searchbox" name="search" value="" />
     </div>
 </div>
 </body>
