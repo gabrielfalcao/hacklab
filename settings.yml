@@ -1,4 +1,7 @@
 application:
+  boot:
+    path: hacklab/startup.py
+    callable: startup
   classes:
     HackLab: /
   image-dir: media/img

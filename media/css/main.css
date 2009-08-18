@@ -2,36 +2,38 @@ body {
     background: url("/media/img/top.jpg") repeat-x;
     margin: 1px 0 0 0;
 }
+#header {
+    overflow: hidden;
+    zoom:1;
+}
 #top {
     margin-top: 8px;
 }
-#top-search {
-    margin-top: 35px;
+#main-search {
     height: 50px;
 }
 
-#top-search input.textbox {
+#main-search input.textbox {
     font-family: Monaco, Monospace, Courier;
     color: #101010;
-    background-color: #B1B1B1;
-    font-size: 20px;
-    border: 2px solid #101010;
+    background-color: #FFF;
+    font-size: 30px;
+    border: 2px solid #B1B1B1;
     float:left;
 }
-
-#top-search input.focused {
-    background-color: #FFF;
-    border-color: #B1B1B1;
+#main-search span {
+    font-family: Monaco, Monospace, Courier;
     color: #B1B1B1;
-    clear: both;
+    font-size: 30px;
+    text-align: center;
 }
 
 a.search-button {
     background: url("/media/img/search.png") no-repeat;
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
     border: 0;
-    float: right;
+    float: left;
 }
 
 #user-box {
@@ -39,6 +41,7 @@ a.search-button {
     font-family: Arial, FreeSans;
     margin: 5px 0 0 0;
     height: 71px;
+    float:right;
 }
 
 #user-pic {
@@ -65,4 +68,12 @@ a.search-button {
 }
 #user-meta span.mini {
     font-size: 12px;
+}
+
+#content {
+    margin-top: 40px;
+}
+
+.test {
+    border:1px solid black;
 }

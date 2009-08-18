@@ -1,5 +1,6 @@
-SearchBox = $.klass({
-    initialize: function (options) {
+var SearchBox = $.klass({
+    initialize: function (element, options) {
+        this.element = element;
         this.settings = $.extend({
             focusClass: 'focused',
             defaultSearchText: "Search repositories"
@@ -32,11 +33,4 @@ SearchBox = $.klass({
             this.element.val("");
         }
     }
-});
-
-$.hacklab.executeOnStartUp(function () {
-    $("index.searchbox").attach(SearchBox, {
-        focusClass: 'focused',
-        defaultSearchText: "Search repositories"
-    });
 });

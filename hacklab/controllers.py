@@ -16,13 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import cherrypy
-import startup
 
 from sponge import route
 from sponge import Controller
 from sponge import template
-
-startup.startup()
 
 class HackLab(Controller):
     @route('/')
