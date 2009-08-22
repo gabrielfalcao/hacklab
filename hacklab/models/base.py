@@ -15,30 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from elixir import Entity, ManyToOne, OneToMany, Field
-from elixir import Unicode, Integer, Boolean
-from elixir import metadata, setup_all
+from sqlalchemy import MetaData
+from sqlalchemy.ext.declarative import declarative_base
 
-class Repository(Entity):
-    id = Field(Integer, primary_key=True)
-    name = Field(Unicode)
-    being_updated = Field(Boolean)
-    is_ready = Field(Boolean)
-    path = Field(Unicode)
-    owner = OneToMany('User')
+from hacklab.models import meta
 
-    def __repr__(self):
-        return "<Repository at '%s'>" % self.path
+metadata = MetaData()
 
-class User(Entity):
-    id = Field(Integer, primary_key=True)
-    name = Field(Unicode)
-    email = Field(Unicode)
-    password = Field(Unicode)
-    repositories = ManyToOne(Repository)
+class BaseModel(object):
+    def save(self):
+        session = meta.get_session()
+        session.add(self)
+        session.commit()
 
-    def __repr__(self):
-        return "<User '%s'>" % self.user
-
-metadata.bind = "sqlite:///database_hacklab.sqlite"
-setup_all()
+Model = declarative_base(cls=BaseModel, metadata=metadata)
