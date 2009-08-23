@@ -48,14 +48,26 @@ class UserController(Controller):
 
         if 'email' and 'password' in data:
             cherrypy.session['user'] = User.create(**data)
-            raise cherrypy.HTTPRedirect('/dashboard')
+            raise cherrypy.HTTPRedirect('/repository/new')
 
         return template.render_html('register.html', data)
+
+    @route('/logout')
+    def logout(self, **data):
+        if 'user' in cherrypy.session:
+            del cherrypy.session['user']
+
+        raise cherrypy.HTTPRedirect('/')
 
 class HackLabController(Controller):
     @route('/')
     def index(self):
-        return template.render_html('register.html')
+        raise cherrypy.HTTPRedirect('/user/new')
+
+    @authenticated_route('/repository/new')
+    def new_repository(self):
+        user = cherrypy.session['user']
+        return template.render_html('repository.new.html', {'user': user})
 
     @route('/login')
     def login(self, **data):

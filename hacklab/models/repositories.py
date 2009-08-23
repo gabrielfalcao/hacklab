@@ -24,4 +24,3 @@ class Repository(object):
 
         instance.save()
         return instance
-
