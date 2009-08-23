@@ -11,37 +11,28 @@
     <script src="/media/js/jquery.ui.js" type="text/javascript"></script>
     <script src="/media/js/jquery.shout.js" type="text/javascript"></script>
     <script src="/media/js/hacklab.js" type="text/javascript"></script>
-    <script src="/media/js/hacklab.newuser.js" type="text/javascript"></script>
 </head>
 <body>
     <div id="header" class="container_16">
       <div id="top" class="grid_3">
 	<img src="/media/img/logo.png" class="logo" alt="HackLab logo" />
       </div>
+      <div id="user-box" class="grid_5">
+	<div id="user-pic">
+	  <img src="/media/img/userpic1.png" alt="Gabriel Falcão" />
+	</div>
+	<div id="user-meta">
+	  <span class="big">Gabriel Falcão</span>
+	  <span class="mini">9 repositories</span>
+	  <span class="mini">83291 commits</span>
+	</div>
+      </div>
     </div>
     <div id="content" class="container_16">
-      <div class="grid_8 prefix_4 fill-form">
-	<ul class="form">
-	  <li class="big">
-	    <span>joining hacklab</span>
-	  </li>
-	  <li>
-	    <label for="name">name</label>
-	    <input type="text" name="name" id="name" class="field" />
-	  </li>
-	  <li>
-	    <label for="email">email</label>
-	    <input type="text" email="email" id="email" class="field" />
-	  </li>
-	  <li>
-	    <label for="password">password</label>
-	    <input type="password" name="password" id="password" class="field" />
-	  </li>
-	  <li>
-	    <label for="next-step">next step</label>
-	      <input type="button" name="go" id="submit" value="create your first repository" disabled="disabled" />
-	  </li>
-	</ul>
+      <div id="main-search" class="grid_8 prefix_4">
+	<span>Search repositories</span>
+	<input type="text" name="search" value="" class="textbox" />
+	<a href="#search" class="search-button"></a>
       </div>
     </div>
 </body>

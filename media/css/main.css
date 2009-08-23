@@ -37,7 +37,9 @@ a.search-button {
 }
 
 #user-box {
-    background: url("/media/img/user-box.png") no-repeat;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    background: url("/media/img/user-box.png") repeat-x;
     font-family: Arial, FreeSans;
     margin: 5px 0 0 0;
     height: 71px;
@@ -76,4 +78,28 @@ a.search-button {
 
 .test {
     border:1px solid black;
+}
+
+ul.form {
+    list-style:none;
+}
+
+ul.form li.big {
+    text-align:center;
+}
+ul.form input, ul.form span, ul.form label {
+    font-size: 30px;
+    font-family: FreeSans, Helvetica, Arial;
+    color: #8a8984;
+}
+ul.form input.field {
+    border:0;
+    color: black;
+    padding-left:5px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    background-color: #729fcf;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    opacity:0.50; -moz-opacity: 0.50;
+    khtml-opacity: .50;
 }
