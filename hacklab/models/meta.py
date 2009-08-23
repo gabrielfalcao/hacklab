@@ -34,4 +34,4 @@ def get_session():
     if not __session__:
         engine = get_engine()
         __session__ = sessionmaker(bind=engine)
-    return __session__()
+    return __session__

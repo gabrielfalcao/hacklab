@@ -4,6 +4,8 @@ all:
 	@make test
 
 db:
+	@echo "Cleaning up database ..."
+	@rm -f database_hacklab.sqlite
 	@echo "Creating database ..."
 	@python -c 'import db;db.create_all()'
 

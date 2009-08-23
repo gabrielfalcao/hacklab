@@ -3,7 +3,8 @@ application:
     path: hacklab/startup.py
     callable: startup
   classes:
-    HackLab: /
+    HackLabController: /
+    UserController: /user
   image-dir: media/img
   path: hacklab/controllers.py
   static:

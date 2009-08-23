@@ -24,7 +24,8 @@ def test_can_create_user():
                 email=u'gabriel@nacaolivre.org',
                 password=u'should-be-hash-sha1')
 
-    session = meta.get_session()
+    Session = meta.get_session()
+    session = Session()
     users = session.query(User).all()
     assert_equals(len(users), 1)
     user = users[0]

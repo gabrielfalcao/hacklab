@@ -14,14 +14,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import cherrypy
+from sponge import route, Controller, template
+from hacklab.models import User
+from hacklab.models.meta import get_session
 
-from sponge import route
-from sponge import Controller
-from sponge import template
+class UserController(Controller):
+    @route('/new')
+    def new_user(self, **data):
+        for k in data.keys():
+            if k not in ('name', 'email', 'password'):
+                del data[k]
 
-class HackLab(Controller):
+        cherrypy.session['user'] = User.create(**data)
+        raise cherrypy.HTTPRedirect('/dashboard')
+
+class HackLabController(Controller):
     @route('/')
     def index(self):
         return template.render_html('index.html')
+
+    @route('/dashboard')
+    def dashboard(self):
+        Session = get_session()
+        session = Session()
+        user = session.query(User).first()
+        return template.render_html('dashboard.html', {'user': user})

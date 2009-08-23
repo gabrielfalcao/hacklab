@@ -24,7 +24,8 @@ metadata = MetaData()
 
 class BaseModel(object):
     def save(self):
-        session = meta.get_session()
+        Session = meta.get_session()
+        session = Session()
         session.add(self)
         session.commit()
 

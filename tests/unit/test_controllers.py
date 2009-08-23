@@ -13,7 +13,7 @@ class TestHackLab:
         controllers.template.render_html('index.html'). \
                     AndReturn('supposed-to-be-the-rendered-html')
 
-        ctrl = controllers.HackLab()
+        ctrl = controllers.HackLabController()
 
         mox.ReplayAll()
         try:
