@@ -29,7 +29,12 @@ class MetaBaseModel(DeclarativeMeta):
         dict_['uuid'] = Column(Unicode, unique=True)
         return DeclarativeMeta.__init__(cls, classname, bases, dict_)
 
+class ObjectNotFound(Exception):
+    pass
+
 class BaseModel(object):
+    NotFound = ObjectNotFound
+
     def save(self):
         self.uuid = unicode(uuid4())
         Session = meta.get_session()
@@ -37,6 +42,7 @@ class BaseModel(object):
         session.add(self)
         session.commit()
         session.flush()
+        session.expire(self)
 
 Model = declarative_base(cls=BaseModel,
                          metadata=metadata,

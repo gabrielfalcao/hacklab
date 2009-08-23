@@ -21,5 +21,7 @@ class Repository(object):
         instance = cls()
         for k,v in kwargs.items():
             setattr(instance, k, v)
+
         instance.save()
         return instance
+

@@ -90,11 +90,29 @@ ul.form li {
     margin-left: 15px;
     clear:both;
 }
+ul.form li.error {
+    font-size: 12px;
+    color: #a40000;
+    background-color: #d2fca7;
+    border: 1px solid #2e3436;
+    text-align:center;
+    margin-bottom:4px;
+    -webkit-border-radius: 10px 10px;
+    -moz-border-radius: 10px 10px;
+}
 
+ul.form li.error a {
+    color: #2e3436;
+    text-decoration:none;
+}
 ul.form input, ul.form span, ul.form label {
     font-size: 28px;
     color: #8a8984;
 }
+#login ul.form input, ul.form span, ul.form label {
+    font-size: 18px;
+}
+
 ul.form label {
     float:left;
 }
@@ -129,9 +147,29 @@ ul.form input.field {
     padding-bottom:5px;
     margin-bottom:5px;
 }
+ul.form input.link {
+    float: left;
+    margin-top: 2px;
+    color: #4e9a06;
+    cursor:pointer;
+    background:transparent;
+    border:0;
+}
 
 div.form-container {
     webkit-border-radius: 15px;
     -moz-border-radius: 15px;
     border:1px solid #ccc;
+}
+
+#tooCool {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    display: block;
+    height: 80px;
+    width: 80px;
+    background: url(/path/to/image/too_cool.png) bottom right no-repeat;
+    text-indent: -999em;
+    text-decoration: none;
 }

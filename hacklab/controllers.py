@@ -17,26 +17,72 @@
 import cherrypy
 from sponge import route, Controller, template
 from hacklab.models import User
-from hacklab.models.meta import get_session
+
+def authenticated_route(path, name=None, login_at='/login'):
+    def decor(func):
+        def wrap(*args, **kw):
+            user = cherrypy.session.get('user')
+            if user:
+                return func(*args, **kw)
+
+            pi = cherrypy.request.path_info
+            raise cherrypy.HTTPRedirect("%s?redirect=%s" % (login_at, pi))
+
+        wrap.__name__ = func.__name__
+        r = route(path, name)
+        return r(wrap)
+
+    return decor
 
 class UserController(Controller):
     @route('/new')
     def new_user(self, **data):
+        if 'email' not in data:
+            data['email'] = ''
+
         for k in data.keys():
             if k not in ('name', 'email', 'password'):
                 del data[k]
+            else:
+                data[k] = unicode(data[k], 'utf-8')
 
-        cherrypy.session['user'] = User.create(**data)
-        raise cherrypy.HTTPRedirect('/dashboard')
+        if 'email' and 'password' in data:
+            cherrypy.session['user'] = User.create(**data)
+            raise cherrypy.HTTPRedirect('/dashboard')
+
+        return template.render_html('register.html', data)
 
 class HackLabController(Controller):
     @route('/')
     def index(self):
-        return template.render_html('index.html')
+        return template.render_html('register.html')
 
-    @route('/dashboard')
+    @route('/login')
+    def login(self, **data):
+        context = {}
+        email = data.get('email')
+        password = data.get('password')
+        redirect_to = data.get('redirect', '/')
+
+        context['not_registered'] = False
+        context['wrong_password'] = False
+        context['email'] = email or ''
+
+        if email and password:
+            try:
+                user = User.authenticate(email, password)
+                cherrypy.session['user'] = user
+                raise cherrypy.HTTPRedirect(redirect_to)
+
+            except User.NotFound, e:
+                context['not_registered'] = unicode(email)
+
+            except User.WrongPassword, e:
+                context['wrong_password'] = unicode(e)
+
+        return template.render_html('login.html', context)
+
+    @authenticated_route('/dashboard')
     def dashboard(self):
-        Session = get_session()
-        session = Session()
-        user = session.query(User).first()
+        user = cherrypy.session['user']
         return template.render_html('dashboard.html', {'user': user})

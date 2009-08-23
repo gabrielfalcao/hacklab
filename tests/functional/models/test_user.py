@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sha
 import md5
-from nose.tools import with_setup, assert_equals
+from nose.tools import with_setup, assert_equals, assert_raises
 from hacklab.models import User, meta
 
 from db import create_all, drop_all
@@ -63,3 +63,33 @@ def test_user_can_get_gravatar_url():
     expected_url = u'http://www.gravatar.com/avatar/%s.jpg' % email_md5
     assert_equals(user.get_gravatar(), expected_url)
 
+@with_setup(create_all, drop_all)
+def test_can_authenticate_user():
+    "User.authenticate(email, passwd) should fetch a valid user"
+
+    User.create(name=u'Foo Bar',
+                email=u'foo@bar.com',
+                password=u'my-password')
+
+
+    user = User.authenticate('foo@bar.com', 'my-password')
+    assert_equals(user.name, 'Foo Bar')
+    assert_equals(user.email, 'foo@bar.com')
+
+@with_setup(create_all, drop_all)
+def test_authenticate_raises_not_found():
+    "User.authenticate raises User.NotFound when not found"
+
+    assert_raises(User.NotFound,
+                  User.authenticate, 'not@database.local', 'my-password')
+
+@with_setup(create_all, drop_all)
+def test_authenticate_raises_wrong_password():
+    "User.authenticate raises User.WrongPassword when password is wrong"
+
+    User.create(name=u'Auth User',
+                email=u'auth@user.com',
+                password=u'my-password')
+
+    assert_raises(User.WrongPassword,
+                  User.authenticate, 'auth@user.com', 'wrong-password')
