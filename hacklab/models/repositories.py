@@ -14,8 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import md5
-from hacklab.models import meta
 
 class Repository(object):
     @classmethod
@@ -25,7 +23,3 @@ class Repository(object):
             setattr(instance, k, v)
         instance.save()
         return instance
-
-    def get_gravatar(self):
-        md5_email = md5.new(self.email).hexdigest()
-        return 'http://www.gravatar.com/avatar/%s.jpg' % md5_email

@@ -14,19 +14,30 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from sqlalchemy import MetaData
+from uuid import uuid4
+from sqlalchemy import MetaData, Column, Integer, Unicode
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
 
 from hacklab.models import meta
 
 metadata = MetaData()
 
+class MetaBaseModel(DeclarativeMeta):
+    def __init__(cls, classname, bases, dict_):
+        dict_['id'] = Column(Integer, primary_key=True)
+        dict_['uuid'] = Column(Unicode, unique=True)
+        return DeclarativeMeta.__init__(cls, classname, bases, dict_)
+
 class BaseModel(object):
     def save(self):
+        self.uuid = unicode(uuid4())
         Session = meta.get_session()
         session = Session()
         session.add(self)
         session.commit()
+        session.flush()
 
-Model = declarative_base(cls=BaseModel, metadata=metadata)
+Model = declarative_base(cls=BaseModel,
+                         metadata=metadata,
+                         metaclass=MetaBaseModel)
