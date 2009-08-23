@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# <HackLab - Web Application for public git repositories hosting>
 # Copyright (C) <2009>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,21 +14,26 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from nose.tools import with_setup, assert_equals
-from hacklab.models import User, meta
 
-from db import create_all, drop_all
+import yaml
+import cherrypy
+from os.path import dirname, abspath, join
+from sponge.core import ConfigValidator, SpongeConfig
 
-@with_setup(create_all, drop_all)
-def test_can_create_user():
-    User.create(name=u'Gabriel Falcão',
-                email=u'gabriel@nacaolivre.org',
-                password=u'should-be-hash-sha1')
+current_dir = abspath(dirname(__file__))
+settings_path = join(current_dir, 'settings.yml')
+yml = yaml.load(open(settings_path).read())
 
-    session = meta.get_session()
-    users = session.query(User).all()
-    assert_equals(len(users), 1)
-    user = users[0]
-    assert_equals(user.name, u'Gabriel Falcão')
-    assert_equals(user.email, u'gabriel@nacaolivre.org')
-    assert_equals(user.password, u'should-be-hash-sha1')
+SpongeConfig(cherrypy.config, ConfigValidator(yml)).setup_all(current_dir)
+
+from hacklab.models import *
+from hacklab.models.meta import get_engine
+from hacklab.models.base import metadata
+
+engine = get_engine(echo=True)
+
+def create_all():
+    metadata.create_all(engine)
+
+def drop_all():
+    metadata.drop_all(engine)

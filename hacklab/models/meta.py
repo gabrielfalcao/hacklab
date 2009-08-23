@@ -22,11 +22,11 @@ from sqlalchemy.orm import sessionmaker
 __session__ = None
 __engine__ = None
 
-def get_engine():
+def get_engine(**kw):
     global __engine__
     if not __engine__:
         engine_string = config['sponge.extra']['database-engine']
-        __engine__ = create_engine(engine_string)
+        __engine__ = create_engine(engine_string, **kw)
     return __engine__
 
 def get_session():
