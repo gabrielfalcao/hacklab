@@ -16,11 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import md5
 import sha
+import cherrypy
 
 from sqlalchemy import Column, Boolean, Unicode
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import relation, backref
 
+from sponge.core.io import FileSystem
 from hacklab.models.meta import get_session
 from hacklab.models.base import Model
 from hacklab.models import repositories as repo
@@ -31,8 +33,16 @@ class User(Model, repo.Repository):
     email = Column(Unicode, nullable=False, unique=True)
     password = Column(Unicode, nullable=False)
 
+    fs = FileSystem()
+
     class WrongPassword(Exception):
         pass
+
+    def get_repository_dir(self):
+        root = cherrypy.config['sponge.root']
+        repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
+        repository_base = self.fs.abspath(self.fs.join(root, repo_dir))
+        return self.fs.abspath(self.fs.join(repository_base, self.uuid))
 
     def get_gravatar(self):
         md5_email = md5.new(self.email).hexdigest()
@@ -49,6 +59,10 @@ class User(Model, repo.Repository):
                                                       self.password)
 
         super(User, self).save(*args, **kw)
+        repodir = self.get_repository_dir()
+        # after having a uuid, then
+        if not self.fs.exists(repodir):
+            self.fs.mkdir(repodir)
 
     @classmethod
     def authenticate(cls, email, password):

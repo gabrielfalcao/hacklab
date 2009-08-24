@@ -16,3 +16,4 @@ port: 4000
 run-as: wsgi
 extra:
   database-engine: sqlite:///database_hacklab.sqlite
+  repositories-dir: ./repositories

@@ -13,12 +13,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import sha
 import md5
+import cherrypy
+
+from os.path import exists, abspath, join
 from nose.tools import with_setup, assert_equals, assert_raises
 from hacklab.models import User, meta
 
 from db import create_all, drop_all
+
+root = cherrypy.config['sponge.root']
+repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
+repository_base = abspath(join(root, repo_dir))
 
 @with_setup(create_all, drop_all)
 def test_can_create_user():
@@ -93,3 +101,28 @@ def test_authenticate_raises_wrong_password():
 
     assert_raises(User.WrongPassword,
                   User.authenticate, 'auth@user.com', 'wrong-password')
+
+@with_setup(create_all, drop_all)
+def test_create_will_make_a_repository_dir_for_user():
+    "User.create() makes a repository base dir for user"
+
+    user = User.create(name=u'Auth User',
+                       email=u'auth@user.com',
+                       password=u'my-password')
+
+    expected = join(repository_base, user.uuid)
+    msg = "After creating a user of uuid %s, the path %s " \
+          "should exist in filesystem" % (user.uuid, expected)
+    assert exists(expected), msg
+
+@with_setup(create_all, drop_all)
+def test_user_get_repository_dir():
+    "User().get_repository_dir() give full path to user's root dir"
+
+    user = User.create(name=u'Auth User',
+                       email=u'auth@user.com',
+                       password=u'my-password')
+
+    expected = abspath(join(repository_base, user.uuid))
+    got = user.get_repository_dir()
+    assert_equals(got, expected)
