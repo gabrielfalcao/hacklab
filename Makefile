@@ -1,4 +1,4 @@
-nosecmd := nosetests -sd --with-coverage --cover-package=hacklab
+nosecmd := nosetests -sd --verbosity=2 --with-coverage --cover-package=hacklab
 
 all:
 	@make test
