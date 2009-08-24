@@ -3,6 +3,12 @@ nosecmd := nosetests -sd --verbosity=2 --with-coverage --cover-package=hacklab
 all:
 	@make test
 
+clear:
+	@echo "Cleaning up files..."
+	@find . -name '*.pyc' -exec rm -rf {} \;
+	@echo "Cleaning up repositories..."
+	@rm -rf repositories
+
 db:
 	@echo "Cleaning up database ..."
 	@rm -f database_hacklab.sqlite
