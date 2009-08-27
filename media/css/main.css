@@ -178,8 +178,6 @@ ul.form input {
 }
 
 ul.form input.button, ul.form input.field {
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
     color: #333;
     font-family: "Lucida Grande",Helvetica,Arial,sans-serif;
 }
