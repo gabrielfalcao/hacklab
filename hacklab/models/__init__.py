@@ -30,6 +30,7 @@ from hacklab.models import repositories as repo
 class User(Model, repo.Repository):
     __tablename__ = 'users'
     name = Column(Unicode, nullable=False)
+    username = Column(Unicode, nullable=False, unique=True)
     email = Column(Unicode, nullable=False, unique=True)
     password = Column(Unicode, nullable=False)
 
@@ -42,7 +43,7 @@ class User(Model, repo.Repository):
         root = cherrypy.config['sponge.root']
         repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
         repository_base = self.fs.abspath(self.fs.join(root, repo_dir))
-        return self.fs.abspath(self.fs.join(repository_base, self.uuid))
+        return self.fs.abspath(self.fs.join(repository_base, self.username))
 
     def get_gravatar(self):
         md5_email = md5.new(self.email).hexdigest()
@@ -86,9 +87,8 @@ class User(Model, repo.Repository):
 class GitRepository(Model, repo.Repository):
     __tablename__ = 'repositories'
     name = Column(Unicode, nullable=False)
-    being_updated = Column(Boolean)
-    is_ready = Column(Boolean)
-    path = Column(Unicode, nullable=False)
+    description = Column(Unicode)
+    slug = Column(Unicode, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relation(User, backref=backref('repositories', order_by=name))
 

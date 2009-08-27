@@ -18,7 +18,6 @@ from uuid import uuid4
 from sqlalchemy import MetaData, Column, Integer, Unicode
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
-
 from hacklab.models import meta
 
 metadata = MetaData()
@@ -38,7 +37,7 @@ class BaseModel(object):
     def save(self):
         self.uuid = unicode(uuid4())
         Session = meta.get_session()
-        session = Session()
+        session = Session.object_session(self) or Session()
         session.add(self)
         session.commit()
         session.flush()

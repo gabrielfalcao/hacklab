@@ -32,6 +32,7 @@ repository_base = abspath(join(root, repo_dir))
 def test_can_create_user():
     "User.create() creates and persists a new user"
     User.create(name=u'John Doe',
+                username=u'john.doe',
                 email=u'john@doe.com',
                 password=u'some-password')
 
@@ -47,6 +48,7 @@ def test_can_create_user():
 def test_new_user_has_hashed_password():
     "User.create() creates a user with hashed password"
     User.create(name=u'John Doe',
+                username=u'john.doe',
                 email=u'john@doe.com',
                 password=u'some-password')
 
@@ -64,6 +66,7 @@ def test_user_can_get_gravatar_url():
     "User().get_gravatar() should fetch user's gravatar"
 
     user = User.create(name=u'John Doe',
+                       username=u'john.doe',
                        email=u'john@doe.com',
                        password=u'some-password')
 
@@ -76,6 +79,7 @@ def test_can_authenticate_user():
     "User.authenticate(email, passwd) should fetch a valid user"
 
     User.create(name=u'Foo Bar',
+                username=u'john.doe',
                 email=u'foo@bar.com',
                 password=u'my-password')
 
@@ -96,6 +100,7 @@ def test_authenticate_raises_wrong_password():
     "User.authenticate raises User.WrongPassword when password is wrong"
 
     User.create(name=u'Auth User',
+                username=u'john.doe',
                 email=u'auth@user.com',
                 password=u'my-password')
 
@@ -107,10 +112,11 @@ def test_create_will_make_a_repository_dir_for_user():
     "User.create() makes a repository base dir for user"
 
     user = User.create(name=u'Auth User',
+                       username=u'john.doe',
                        email=u'auth@user.com',
                        password=u'my-password')
 
-    expected = join(repository_base, user.uuid)
+    expected = join(repository_base, "john.doe")
     msg = "After creating a user of uuid %s, the path %s " \
           "should exist in filesystem" % (user.uuid, expected)
     assert exists(expected), msg
@@ -120,9 +126,10 @@ def test_user_get_repository_dir():
     "User().get_repository_dir() give full path to user's root dir"
 
     user = User.create(name=u'Auth User',
+                       username=u'john.doe',
                        email=u'auth@user.com',
                        password=u'my-password')
 
-    expected = abspath(join(repository_base, user.uuid))
+    expected = abspath(join(repository_base, "john.doe"))
     got = user.get_repository_dir()
     assert_equals(got, expected)
