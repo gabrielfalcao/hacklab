@@ -5,6 +5,10 @@ $(function (){
                     required: true,
                     minlength: 5
                 },
+                username: {
+                    required: true,
+                    minlength: 3
+                },
                 password: {
                     required: true,
                     minlength: 5
@@ -16,6 +20,7 @@ $(function (){
             },
             messages: {
                 name: "Please enter your name",
+                username: "Please choose a username",
                 password: {
                     required: "Please provide a password",
                     minlength: "Your password must be at least 5 characters long"

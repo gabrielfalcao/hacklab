@@ -37,16 +37,20 @@ def authenticated_route(path, name=None, login_at='/login'):
 class UserController(Controller):
     @route('/new')
     def new_user(self, **data):
+        needed = set(('email', 'username', 'password'))
         if 'email' not in data:
             data['email'] = ''
 
+        if 'username' not in data:
+            data['username'] = ''
+
         for k in data.keys():
-            if k not in ('name', 'email', 'password'):
+            if k not in ('name', 'username', 'email', 'password'):
                 del data[k]
             else:
                 data[k] = unicode(data[k], 'utf-8')
 
-        if 'email' and 'password' in data:
+        if not needed.difference(set(data.keys())):
             cherrypy.session['user'] = User.create(**data)
             raise cherrypy.HTTPRedirect('/repository/new')
 
