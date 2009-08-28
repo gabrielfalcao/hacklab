@@ -1,7 +1,4 @@
 application:
-  boot:
-    path: hacklab/startup.py
-    callable: startup
   classes:
     HackLabController: /
     UserController: /user
