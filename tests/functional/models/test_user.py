@@ -133,3 +133,17 @@ def test_user_get_repository_dir():
     expected = abspath(join(repository_base, "john.doe"))
     got = user.get_repository_dir()
     assert_equals(got, expected)
+
+@with_setup(create_all, drop_all)
+def test_can_add_keys_to_user():
+    "User().keys.add_public_key(description, content) adds a ssh pub key to user"
+
+    user = User.create(name=u'SSH User',
+                       username=u'john.doe',
+                       email=u'auth@user.com',
+                       password=u'my-password')
+
+    user.add_public_key("laptop key", "ssh-rsa aAbBcCdD1e2f3g4h5I== john@doe.net")
+    assert_equals(user.keys[0].description, "laptop key")
+    assert_equals(user.keys[0].data, "ssh-rsa aAbBcCdD1e2f3g4h5I== john@doe.net")
+

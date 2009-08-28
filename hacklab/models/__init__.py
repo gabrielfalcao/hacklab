@@ -18,7 +18,7 @@ import md5
 import sha
 import cherrypy
 
-from sqlalchemy import Column, Boolean, Unicode
+from sqlalchemy import Column, Unicode
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import relation, backref
 
@@ -38,6 +38,11 @@ class User(Model, repo.Repository):
 
     class WrongPassword(Exception):
         pass
+
+    def add_public_key(self, description, data):
+        self.keys.append(PublicKey(description=unicode(description),
+                                   data=unicode(data)))
+        self.save()
 
     def get_repository_dir(self):
         root = cherrypy.config['sponge.root']
@@ -94,4 +99,14 @@ class GitRepository(Model, repo.Repository):
 
     def __repr__(self):
         return "<GitRepository at '%s'>" % self.path
+
+class PublicKey(Model, repo.Repository):
+    __tablename__ = 'ssh_public_keys'
+    description = Column(Unicode)
+    data = Column(Unicode)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    owner = relation(User, backref=backref('keys', order_by=description))
+
+    def __repr__(self):
+        return "<SSHPublicKey at '%s'>" % self.path
 
