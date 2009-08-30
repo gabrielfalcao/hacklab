@@ -22,6 +22,17 @@ from sqlalchemy.orm import scoped_session
 
 __session__ = None
 __engine__ = None
+_MODELS = {}
+
+class UndefinedModel(Exception):
+    pass
+
+def get_model(name):
+    try:
+        return _MODELS[name]
+    except KeyError:
+        raise UndefinedModel, "The model %s does not exist, " \
+              "perharps it hasn't been imported" % name
 
 def get_engine(**kw):
     global __engine__

@@ -14,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from uuid import uuid4
 from sqlalchemy import MetaData, Column, Integer, Unicode
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
@@ -26,6 +25,7 @@ class MetaBaseModel(DeclarativeMeta):
     def __init__(cls, classname, bases, dict_):
         dict_['id'] = Column(Integer, primary_key=True)
         dict_['uuid'] = Column(Unicode, unique=True)
+        meta._MODELS[classname] = cls
         return DeclarativeMeta.__init__(cls, classname, bases, dict_)
 
 class ObjectNotFound(Exception):
@@ -33,13 +33,6 @@ class ObjectNotFound(Exception):
 
 class BaseModel(object):
     NotFound = ObjectNotFound
-
-    def save(self):
-        self.uuid = unicode(uuid4())
-        Session = meta.get_session()
-        session = Session()
-        session.add(self)
-        session.commit()
 
 Model = declarative_base(cls=BaseModel,
                          metadata=metadata,

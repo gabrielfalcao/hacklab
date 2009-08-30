@@ -15,7 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import md5
+import sha
+import cherrypy
+
+from uuid import uuid4
+
+from sponge.core.io import FileSystem
+
+from hacklab.models import meta
+
 class Repository(object):
+    fs = FileSystem()
     @classmethod
     def create(cls, **kwargs):
         instance = cls()
@@ -24,3 +35,62 @@ class Repository(object):
 
         instance.save()
         return instance
+
+    def save(self):
+        self.uuid = unicode(uuid4())
+        Session = meta.get_session()
+        session = Session()
+        session.add(self)
+        session.commit()
+
+class UserRepository(Repository):
+    class WrongPassword(Exception):
+        pass
+
+    def add_public_key(self, description, data):
+        PublicKey = meta.get_model('PublicKey')
+        self.keys.append(PublicKey(description=unicode(description),
+                                   data=unicode(data)))
+        self.save()
+
+    def get_repository_dir(self):
+        root = cherrypy.config['sponge.root']
+        repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
+        repository_base = self.fs.abspath(self.fs.join(root, repo_dir))
+        return self.fs.abspath(self.fs.join(repository_base, self.username))
+
+    def get_gravatar(self):
+        md5_email = md5.new(self.email).hexdigest()
+        return 'http://www.gravatar.com/avatar/%s.jpg' % md5_email
+
+    @classmethod
+    def make_hashed_password(cls, email, password):
+        base = "%s+%s" % (email, password)
+        return u"hash:%s" % sha.new(base).hexdigest()
+
+    def save(self):
+        if not self.password.startswith("hash:"):
+            self.password = self.make_hashed_password(self.email,
+                                                      self.password)
+
+        super(UserRepository, self).save()
+        repodir = self.get_repository_dir()
+        # after having a uuid, then
+        if not self.fs.exists(repodir):
+            self.fs.mkdir(repodir)
+
+    @classmethod
+    def authenticate(cls, email, password):
+        Session = meta.get_session()
+        session = Session()
+        user = session.query(cls).filter_by(email=unicode(email)).first()
+        if not user:
+            raise cls.NotFound, \
+                  'User with email %s is not yet registered' % email
+
+        password = cls.make_hashed_password(email, password)
+
+        if user.password == password:
+            return user
+        else:
+            raise cls.WrongPassword, 'The password is wrong'
