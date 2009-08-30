@@ -42,8 +42,7 @@ class Repository(object):
         if not self.uuid:
             self.uuid = unicode(uuid.uuid4())
 
-        Session = meta.get_session()
-        session = Session()
+        session = meta.get_session()
         session.add(self)
         session.commit()
 
@@ -86,8 +85,7 @@ class UserRepository(Repository):
 
     @classmethod
     def authenticate(cls, email, password):
-        Session = meta.get_session()
-        session = Session()
+        session = meta.get_session()
         user = session.query(cls).filter_by(email=unicode(email)).first()
         if not user:
             raise cls.NotFound, \

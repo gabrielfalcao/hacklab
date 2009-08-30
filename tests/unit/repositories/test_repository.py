@@ -26,7 +26,7 @@ class MetaStub(object):
             pass
 
     def get_session(self):
-        return self.SessionStub
+        return self.SessionStub()
 
 def test_repository_create_setattr():
     "Repository.create() should set given attributes in a new object"
@@ -133,10 +133,7 @@ def test_repository_save_adds_object_to_session_and_commits():
     session_mock.add(model)
     session_mock.commit()
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:

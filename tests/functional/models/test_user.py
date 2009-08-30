@@ -36,8 +36,7 @@ def test_can_create_user():
                 email=u'john@doe.com',
                 password=u'some-password')
 
-    Session = meta.get_session()
-    session = Session()
+    session = meta.get_session()
     users = session.query(User).all()
     assert_equals(len(users), 1)
     user = users[0]
@@ -52,8 +51,7 @@ def test_new_user_has_hashed_password():
                 email=u'john@doe.com',
                 password=u'some-password')
 
-    Session = meta.get_session()
-    session = Session()
+    session = meta.get_session()
     user = session.query(User).first()
 
     concatenated = 'john@doe.com+some-password'

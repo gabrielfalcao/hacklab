@@ -40,8 +40,7 @@ def test_can_create_repository():
                          owner=gabriel,
                          slug=u"hacklab-contrib")
 
-    Session = meta.get_session()
-    session = Session()
+    session = meta.get_session()
     repositories = session.query(GitRepository).all()
     assert_equals(len(repositories), 1)
     repository = repositories[0]

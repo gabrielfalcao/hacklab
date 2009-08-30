@@ -186,10 +186,7 @@ def test_save_hashes_password_if_does_not_start_with_hash():
     session_mock.add(user)
     session_mock.commit()
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:
@@ -222,10 +219,7 @@ def test_save_doesnt_touch_password_if_already_hashed():
     session_mock.add(user)
     session_mock.commit()
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:
@@ -259,10 +253,7 @@ def test_save_should_create_user_repo_dir():
     session_mock.add(user)
     session_mock.commit()
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:
@@ -292,10 +283,7 @@ def test_authenticate_returns_user_if_found():
     session_mock.filter_by(email=u'my@email.com').AndReturn(session_mock)
     session_mock.first().AndReturn(user)
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:
@@ -321,10 +309,7 @@ def test_authenticate_raises_not_found():
     session_mock.filter_by(email=u'my@email.com').AndReturn(session_mock)
     session_mock.first().AndReturn(None)
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:
@@ -357,10 +342,7 @@ def test_authenticate_raises_wrong_password():
     session_mock.filter_by(email=u'my@email.com').AndReturn(session_mock)
     session_mock.first().AndReturn(user)
 
-    session_class_mock = mocker.CreateMockAnything()
-    session_class_mock().AndReturn(session_mock)
-
-    rep.meta.get_session().AndReturn(session_class_mock)
+    rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
     try:
