@@ -35,7 +35,9 @@ class Repository(object):
         return instance
 
     def save(self):
-        self.uuid = unicode(uuid.uuid4())
+        if not self.uuid:
+            self.uuid = unicode(uuid.uuid4())
+
         Session = meta.get_session()
         session = Session()
         session.add(self)

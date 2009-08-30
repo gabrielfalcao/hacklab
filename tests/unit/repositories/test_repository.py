@@ -102,6 +102,22 @@ def test_repository_save_adds_uuid():
         mocker.UnsetStubs()
         rep.meta = old_meta
 
+def test_repository_save_doesnt_touch():
+    "Repository.save() shouldn't set a uuid if it already has one"
+
+    old_meta = rep.meta
+    rep.meta = MetaStub()
+
+    class ModelStub(rep.Repository):
+        uuid = 'my-uuid'
+
+    model = ModelStub()
+    try:
+        model.save()
+        assert_equals(model.uuid, 'my-uuid')
+    finally:
+        rep.meta = old_meta
+
 def test_repository_save_adds_object_to_session_and_commits():
     "Repository.save() should set add object to session, and commit."
 
