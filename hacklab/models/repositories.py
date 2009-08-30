@@ -17,9 +17,9 @@
 
 import md5
 import sha
+import uuid
 import cherrypy
 
-from uuid import uuid4
 
 from sponge.core.io import FileSystem
 
@@ -37,7 +37,7 @@ class Repository(object):
         return instance
 
     def save(self):
-        self.uuid = unicode(uuid4())
+        self.uuid = unicode(uuid.uuid4())
         Session = meta.get_session()
         session = Session()
         session.add(self)

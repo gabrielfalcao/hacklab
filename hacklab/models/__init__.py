@@ -30,7 +30,7 @@ class User(Model, UserRepository):
     email = Column(Unicode, nullable=False, unique=True)
     password = Column(Unicode, nullable=False)
 
-    def __repr__(self):
+    def __unicode__(self):
         return "<User '%s'>" % self.name
 
 class GitRepository(Model, Repository):
@@ -41,7 +41,7 @@ class GitRepository(Model, Repository):
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relation(User, backref=backref('repositories', order_by=name))
 
-    def __repr__(self):
+    def __unicode__(self):
         return "<GitRepository at '%s'>" % self.path
 
 class PublicKey(Model, Repository):
@@ -51,6 +51,6 @@ class PublicKey(Model, Repository):
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relation(User, backref=backref('keys', order_by=description))
 
-    def __repr__(self):
+    def __unicode__(self):
         return "<SSHPublicKey at '%s'>" % self.path
 

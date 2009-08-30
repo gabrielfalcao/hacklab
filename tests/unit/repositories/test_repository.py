@@ -18,6 +18,16 @@ from mox import Mox
 from nose.tools import assert_equals
 from hacklab.models import repositories as rep
 
+class MetaStub(object):
+    class SessionStub(object):
+        def add(self, other):
+            pass
+        def commit(self):
+            pass
+
+    def get_session(self):
+        return self.SessionStub
+
 def test_repository_create_setattr():
     "Repository.create() should set given attributes in a new object"
 
@@ -67,3 +77,54 @@ def test_repository_create_returns_a_instance_of_model():
     assert isinstance(got, ModelStub)
     assert_equals(got.name, 'John Doe')
     assert_equals(got.email, 'john@doe.net')
+
+def test_repository_save_adds_uuid():
+    "Repository.save() should set a uuid to model if hasn't one yet"
+
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'uuid')
+
+    old_meta = rep.meta
+    rep.meta = MetaStub()
+
+    rep.uuid.uuid4().AndReturn('some-uuid')
+
+    class ModelStub(rep.Repository):
+        uuid = None
+
+    model = ModelStub()
+    mocker.ReplayAll()
+    try:
+        model.save()
+        assert_equals(model.uuid, 'some-uuid')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+        rep.meta = old_meta
+
+def test_repository_save_adds_object_to_session_and_commits():
+    "Repository.save() should set add object to session, and commit."
+
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+
+    class ModelStub(rep.Repository):
+        uuid = None
+
+    model = ModelStub()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.add(model)
+    session_mock.commit()
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        model.save()
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
