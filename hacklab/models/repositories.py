@@ -20,9 +20,7 @@ import sha
 import uuid
 import cherrypy
 
-
 from sponge.core.io import FileSystem
-
 from hacklab.models import meta
 
 class Repository(object):
@@ -56,8 +54,9 @@ class UserRepository(Repository):
     def get_repository_dir(self):
         root = cherrypy.config['sponge.root']
         repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
-        repository_base = self.fs.abspath(self.fs.join(root, repo_dir))
-        return self.fs.abspath(self.fs.join(repository_base, self.username))
+        repository_base = self.fs.join(root, repo_dir)
+        return self.fs.abspath(self.fs.join(repository_base,
+                                            self.username))
 
     def get_gravatar(self):
         md5_email = md5.new(self.email).hexdigest()
