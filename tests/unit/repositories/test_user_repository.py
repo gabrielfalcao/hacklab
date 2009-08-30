@@ -36,7 +36,7 @@ def teardown_cherrypy():
     cherrypy.config.update(old_config)
 
 def test_get_gravatar():
-    "UserRepository().get_gravatar() should return user's' gravatar url."
+    "UserRepository().get_gravatar() should return user's gravatar url."
     mocker = Mox()
 
     mocker.StubOutWithMock(rep, 'md5')
@@ -81,3 +81,59 @@ def test_get_repository_dir():
     assert_equals(user.get_repository_dir(),
                   'should-be-absolute-path-to-user-repo')
     mocker.VerifyAll()
+
+
+def test_add_public_key_appends_pubkeymodel():
+    "UserRepository().add_public_key() should add PublicKey to user.keys"
+    mocker = Mox()
+
+    mocker.StubOutWithMock(rep, 'meta')
+
+    pubkey_model_mock = mocker.CreateMockAnything()
+    pubkey_model_mock(description=u'my description',
+                      data=u'my-ssh-key-data'). \
+        AndReturn('should-be-pubkey-model-object')
+    rep.meta.get_model('PublicKey').AndReturn(pubkey_model_mock)
+
+    class UserStub(rep.UserRepository):
+        keys = []
+        def save(self):
+            pass
+
+    user = UserStub()
+    mocker.ReplayAll()
+    expected = 'http://www.gravatar.com/avatar/should-be-md5-of-email.jpg'
+    try:
+        user.add_public_key('my description', 'my-ssh-key-data')
+        assert_equals(user.keys[0], 'should-be-pubkey-model-object')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+def test_add_public_key_saves_the_model():
+    "UserRepository().add_public_key() should save the model"
+    mocker = Mox()
+
+    mocker.StubOutWithMock(rep, 'meta')
+
+    pubkey_model_mock = mocker.CreateMockAnything()
+    pubkey_model_mock(description=u'my description',
+                      data=u'my-ssh-key-data'). \
+        AndReturn('should-be-pubkey-model-object')
+    rep.meta.get_model('PublicKey').AndReturn(pubkey_model_mock)
+
+    class UserStub(rep.UserRepository):
+        keys = []
+        save = mocker.CreateMockAnything()
+
+    UserStub.save()
+    user = UserStub()
+    mocker.ReplayAll()
+    expected = 'http://www.gravatar.com/avatar/should-be-md5-of-email.jpg'
+    try:
+        user.add_public_key('my description', 'my-ssh-key-data')
+        assert_equals(user.keys[0], 'should-be-pubkey-model-object')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
