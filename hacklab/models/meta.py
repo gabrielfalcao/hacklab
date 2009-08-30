@@ -18,6 +18,7 @@
 from cherrypy import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session
 
 __session__ = None
 __engine__ = None
@@ -33,5 +34,5 @@ def get_session():
     global __session__
     if not __session__:
         engine = get_engine()
-        __session__ = sessionmaker(bind=engine)
+        __session__ = scoped_session(sessionmaker(bind=engine))
     return __session__

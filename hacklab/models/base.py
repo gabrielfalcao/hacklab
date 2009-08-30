@@ -37,11 +37,9 @@ class BaseModel(object):
     def save(self):
         self.uuid = unicode(uuid4())
         Session = meta.get_session()
-        session = Session.object_session(self) or Session()
+        session = Session()
         session.add(self)
         session.commit()
-        session.flush()
-        session.expire(self)
 
 Model = declarative_base(cls=BaseModel,
                          metadata=metadata,
