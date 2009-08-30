@@ -137,3 +137,24 @@ def test_add_public_key_saves_the_model():
     finally:
         mocker.UnsetStubs()
 
+def test_make_hashed_password():
+    "UserRepository.make_hashed_password() make a hash with user data"
+    mocker = Mox()
+
+    mocker.StubOutWithMock(rep, 'sha')
+
+    sha_mock = mocker.CreateMockAnything()
+    sha_mock.hexdigest().AndReturn('should-be-email+password-hash')
+
+    rep.sha.new('some@email.com+some-password').AndReturn(sha_mock)
+
+    mocker.ReplayAll()
+    expected = 'hash:should-be-email+password-hash'
+    try:
+        got = rep.UserRepository.make_hashed_password('some@email.com',
+                                                      'some-password')
+        assert_equals(got, expected)
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
