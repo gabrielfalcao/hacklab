@@ -16,7 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import cherrypy
 from mox import Mox
-from nose.tools import assert_equals, with_setup
+from nose.tools import with_setup
+from nose.tools import assert_equals
+from nose.tools import assert_raises
 from hacklab.models import repositories as rep
 
 old_config = {}
@@ -158,3 +160,213 @@ def test_make_hashed_password():
     finally:
         mocker.UnsetStubs()
 
+@with_setup(setup_cherrypy, teardown_cherrypy)
+def test_save_hashes_password_if_does_not_start_with_hash():
+    "UserRepository().save() should replace the password with a hash"
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+    class UserStub(rep.UserRepository):
+        fs = mocker.CreateMockAnything()
+        username = 'my-username'
+        email = 'my@email.com'
+        uuid = 'my-uuid'
+        password = 'does not start with hash:'
+        make_hashed_password = mocker.CreateMockAnything()
+        def get_repository_dir(self):
+            return '/my/repo/dir'
+
+    UserStub.fs.exists('/my/repo/dir').AndReturn(True)
+    UserStub.make_hashed_password('my@email.com',
+                                  'does not start with hash:'). \
+        AndReturn('my-hash')
+
+    user = UserStub()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.add(user)
+    session_mock.commit()
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        user.save()
+        assert_equals(user.password, 'my-hash')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+@with_setup(setup_cherrypy, teardown_cherrypy)
+def test_save_doesnt_touch_password_if_already_hashed():
+    "UserRepository().save() should not touch a already hashed password"
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+    class UserStub(rep.UserRepository):
+        fs = mocker.CreateMockAnything()
+        username = 'my-username'
+        email = 'my@email.com'
+        uuid = 'my-uuid'
+        password = 'hash:my-hash'
+        make_hashed_password = mocker.CreateMockAnything()
+        def get_repository_dir(self):
+            return '/my/repo/dir'
+
+    UserStub.fs.exists('/my/repo/dir').AndReturn(True)
+
+    user = UserStub()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.add(user)
+    session_mock.commit()
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        user.save()
+        assert_equals(user.password, 'hash:my-hash')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+@with_setup(setup_cherrypy, teardown_cherrypy)
+def test_save_should_create_user_repo_dir():
+    "UserRepository().save() creates user's repository if it does not exist"
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+    class UserStub(rep.UserRepository):
+        fs = mocker.CreateMockAnything()
+        username = 'my-username'
+        email = 'my@email.com'
+        uuid = 'my-uuid'
+        password = 'hash:my-hash'
+        make_hashed_password = mocker.CreateMockAnything()
+        def get_repository_dir(self):
+            return '/my/repo/dir'
+
+    UserStub.fs.exists('/my/repo/dir').AndReturn(False)
+    UserStub.fs.mkdir('/my/repo/dir')
+
+    user = UserStub()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.add(user)
+    session_mock.commit()
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        user.save()
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+def test_authenticate_returns_user_if_found():
+    "UserRepository.authenticate() returns user object if is found"
+
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+
+    class UserStub(rep.UserRepository):
+        email = 'my@email.com'
+        password = 'hash:my-hash'
+        make_hashed_password = mocker.CreateMockAnything()
+
+    UserStub.make_hashed_password('my@email.com', 'some-password'). \
+        AndReturn('hash:my-hash')
+
+    user = UserStub()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.query(UserStub).AndReturn(session_mock)
+    session_mock.filter_by(email=u'my@email.com').AndReturn(session_mock)
+    session_mock.first().AndReturn(user)
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        got = UserStub.authenticate('my@email.com', 'some-password')
+        assert_equals(got, user)
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+def test_authenticate_raises_not_found():
+    "UserRepository.authenticate() raises exception when user's not found"
+
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+
+    class UserStub(rep.UserRepository):
+        email = 'my@email.com'
+        password = 'hash:my-hash'
+        make_hashed_password = mocker.CreateMockAnything()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.query(UserStub).AndReturn(session_mock)
+    session_mock.filter_by(email=u'my@email.com').AndReturn(session_mock)
+    session_mock.first().AndReturn(None)
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        assert_raises(UserStub.NotFound,
+                      UserStub.authenticate,
+                      'my@email.com', 'some-password')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+def test_authenticate_raises_wrong_password():
+    "UserRepository.authenticate() raises exception with wrong password"
+
+
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+
+    class UserStub(rep.UserRepository):
+        email = 'my@email.com'
+        password = 'hash:my-hash'
+        make_hashed_password = mocker.CreateMockAnything()
+
+    UserStub.make_hashed_password('my@email.com', 'wrong-password'). \
+        AndReturn('hash:wrong-hash')
+
+    user = UserStub()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.query(UserStub).AndReturn(session_mock)
+    session_mock.filter_by(email=u'my@email.com').AndReturn(session_mock)
+    session_mock.first().AndReturn(user)
+
+    session_class_mock = mocker.CreateMockAnything()
+    session_class_mock().AndReturn(session_mock)
+
+    rep.meta.get_session().AndReturn(session_class_mock)
+
+    mocker.ReplayAll()
+    try:
+        assert_raises(UserStub.WrongPassword,
+                      UserStub.authenticate,
+                      'my@email.com', 'wrong-password')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()

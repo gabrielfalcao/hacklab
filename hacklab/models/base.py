@@ -28,12 +28,5 @@ class MetaBaseModel(DeclarativeMeta):
         meta._MODELS[classname] = cls
         return DeclarativeMeta.__init__(cls, classname, bases, dict_)
 
-class ObjectNotFound(Exception):
-    pass
-
-class BaseModel(object):
-    NotFound = ObjectNotFound
-
-Model = declarative_base(cls=BaseModel,
-                         metadata=metadata,
+Model = declarative_base(metadata=metadata,
                          metaclass=MetaBaseModel)

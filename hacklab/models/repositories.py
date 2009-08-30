@@ -23,7 +23,11 @@ import cherrypy
 from sponge.core.io import FileSystem
 from hacklab.models import meta
 
+class ObjectNotFound(Exception):
+    pass
+
 class Repository(object):
+    NotFound = ObjectNotFound
     fs = FileSystem()
     @classmethod
     def create(cls, **kwargs):
