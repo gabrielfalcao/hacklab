@@ -1,39 +1,54 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
+<html xmlns="http://www.w3.org/1999/xhtml"
+           xmlns:py="http://genshi.edgewall.org/"
+           xmlns:xi="http://www.w3.org/2001/XInclude"
+           lang="en"
+           py:strip="">
+  <head py:match="head" py:attrs="select('@*')">
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Welcome to Sponge!</title>
+      <title py:replace="select('title|text()')">Hacklab</title>
     <link rel="stylesheet" href="/media/css/reset.css" />
     <link rel="stylesheet" href="/media/css/text.css" />
     <link rel="stylesheet" href="/media/css/960.css" />
     <link rel="stylesheet" href="/media/css/main.css" />
+    ${select("link|text()")}
     <script src="/media/js/jquery.js" type="text/javascript"></script>
     <script src="/media/js/jquery.ui.js" type="text/javascript"></script>
     <script src="/media/js/jquery.shout.js" type="text/javascript"></script>
     <script src="/media/js/hacklab.js" type="text/javascript"></script>
-</head>
-<body>
+    <script py:if="defined('user')" src="/media/js/hacklab.user.js" type="text/javascript"></script>
+    ${select("script|text()")}
+  </head>
+  <body py:match="body" py:attrs="select('@*')">
     <div id="header" class="container_16">
       <div id="top" class="grid_3">
 	<img src="/media/img/logo.png" class="logo" alt="HackLab logo" />
       </div>
-      <div id="user-box" class="grid_5">
+      <div id="user-box" class="grid_5" py:if="defined('user')">
 	<div id="user-pic">
-	  <img src="/media/img/userpic1.png" alt="Gabriel Falcão" />
+	  <img src="${user.get_gravatar()}" alt="Gabriel Falcão" width="48" height="48"/>
 	</div>
 	<div id="user-meta">
-	  <span class="big">Gabriel Falcão</span>
-	  <span class="mini">9 repositories</span>
-	  <span class="mini">83291 commits</span>
+	  <span class="big">${user.name}</span>
+	  <span class="mini">${user.total_of_repositories} repositories</span>
+	  <!--! <span class="mini">10 followers</span> -->
 	</div>
       </div>
     </div>
-    <div id="content" class="container_16">
-      <div id="main-search" class="grid_8 prefix_4">
-	<span>Search repositories</span>
-	<input type="text" name="search" value="" class="textbox" />
-	<a href="#search" class="search-button"></a>
+
+    <!-- absolute elements -->
+    <div id="actions-sticker" py:if="defined('user')">
+      <div class="content">
+	<a href="/user/account">account management</a>
+	<a href="/user/logout">logout</a>
+      </div>
+      <div class="label">
+	actions
       </div>
     </div>
-</body>
+    <!-- end of absolute elements -->
+
+    <div py:replace="select('*|text()')">This page has no content.</div>
+
+  </body>
 </html>

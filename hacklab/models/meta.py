@@ -45,5 +45,5 @@ def get_session():
     global __session__
     if not __session__:
         engine = get_engine()
-        __session__ = scoped_session(sessionmaker(bind=engine))()
-    return __session__
+        __session__ = scoped_session(sessionmaker(bind=engine))
+    return __session__()

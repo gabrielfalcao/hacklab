@@ -35,6 +35,11 @@ def authenticated_route(path, name=None, login_at='/login'):
     return decor
 
 class UserController(Controller):
+    @authenticated_route('/account')
+    def manage_account(self, **data):
+        user = cherrypy.session['user']
+        return template.render_html('user/account.html', {'user': user})
+
     @route('/new')
     def new_user(self, **data):
         needed = set(('email', 'username', 'password'))
@@ -54,7 +59,7 @@ class UserController(Controller):
             cherrypy.session['user'] = User.create(**data)
             raise cherrypy.HTTPRedirect('/repository/new')
 
-        return template.render_html('register.html', data)
+        return template.render_html('user/register.html', data)
 
     @route('/logout')
     def logout(self, **data):
@@ -71,7 +76,7 @@ class HackLabController(Controller):
     @authenticated_route('/repository/new')
     def new_repository(self):
         user = cherrypy.session['user']
-        return template.render_html('repository.new.html', {'user': user})
+        return template.render_html('repository/new.html', {'user': user})
 
     @route('/login')
     def login(self, **data):
@@ -96,7 +101,7 @@ class HackLabController(Controller):
             except User.WrongPassword, e:
                 context['wrong_password'] = unicode(e)
 
-        return template.render_html('login.html', context)
+        return template.render_html('user/login.html', context)
 
     @authenticated_route('/dashboard')
     def dashboard(self):

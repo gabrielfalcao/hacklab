@@ -72,6 +72,13 @@ class UserRepository(Repository):
         base = "%s+%s" % (email, password)
         return u"hash:%s" % sha.new(base).hexdigest()
 
+    @property
+    def total_of_repositories(self):
+        cls = meta.get_model('GitRepository')
+        session = meta.get_session()
+        total = session.query(cls).filter_by(owner=self).count()
+        return total
+
     def save(self):
         if not self.password.startswith("hash:"):
             self.password = self.make_hashed_password(self.email,
@@ -87,6 +94,7 @@ class UserRepository(Repository):
     def authenticate(cls, email, password):
         session = meta.get_session()
         user = session.query(cls).filter_by(email=unicode(email)).first()
+
         if not user:
             raise cls.NotFound, \
                   'User with email %s is not yet registered' % email

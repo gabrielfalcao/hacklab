@@ -148,8 +148,27 @@ ul.form li.error {
 
 ul.form li.error a {
     color: #2e3436;
+    font-size: 12px;
     text-decoration:none;
 }
+ul.form li.msg * {
+    font-size: 12px;
+    color: #2e3436;
+}
+ul.form li.msg {
+    background-color: #FFF;
+    border: 1px solid #D0D1CA;
+    text-align:center;
+    margin-bottom:4px;
+    -webkit-border-radius: 5px 5px;
+    -moz-border-radius: 5px 5px;
+}
+
+ul.form li.msg a {
+    color: #000;
+    text-decoration:none;
+}
+
 ul.form input, ul.form span, ul.form label {
     font-size: 28px;
     color: #8a8984;
