@@ -1,27 +1,41 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-      <title>HackLab, GNU hackers are here</title>
-    <link rel="stylesheet" href="/media/css/reset.css" />
-    <link rel="stylesheet" href="/media/css/text.css" />
-    <link rel="stylesheet" href="/media/css/960.css" />
-    <link rel="stylesheet" href="/media/css/jquery-ui.css" />
-    <link rel="stylesheet" href="/media/css/main.css" />
-    <script src="/media/js/jquery.js" type="text/javascript"></script>
-    <script src="/media/js/jquery.ui.js" type="text/javascript"></script>
-    <script src="/media/js/jquery.shout.js" type="text/javascript"></script>
-    <script src="/media/js/jquery.validate.js" type="text/javascript"></script>
-    <script src="/media/js/hacklab.js" type="text/javascript"></script>
-    <script src="/media/js/hacklab.newuser.js" type="text/javascript"></script>
-  </head>
-  <body>
-    <div id="header" class="container_16">
-      <div id="top" class="grid_3">
-	<img src="/media/img/logo.png" class="logo" alt="HackLab logo" />
-      </div>
-    </div>
-    <div id="content" class="container_16">
-    </div><!-- end #content-->
-  </body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      lang="en">
+<xi:include href="base.html" />
+    <head>
+      <title>${user.name}'s account details at hacklab</title>
+    </head>
+    <body>
+      <div id="content" class="container_16">
+	<div class="grid_10 prefix_3">
+	  <div class="simple-corner">
+	    <h1>account details</h1>
+	    <hr />
+	    <h2>change password</h2>
+	    <form action="/user/change-password" method="post">
+	      <ul class="litle-form">
+		<li><input class="simple-corner" type="password" name="password" value="" /></li>
+		<li><input class="simple-corner" type="password" name="confirmation" value="" /></li>
+		<li><input type="button" value="save" /></li>
+	      </ul>
+	    </form>
+	  </div><!--! .simple-corner -->
+	</div><!--! .grid -->
+      </div><!--! .container -->
+      <div id="content" class="container_16">
+	<div class="grid_10 prefix_3">
+	  <div class="simple-corner">
+	    <h1>ssh keys</h1>
+	    <hr />
+	    <ul class="litle-form">
+	      <li>ssh-rsa AAAAB3NzaC1yc2EAAA <a class="edit" href="#edit">(edit)</a><a class="delete" href="#delete">(delete)</a></li>
+	      <li>key of work laptop <a class="edit" href="#edit">(edit)</a><a class="delete" href="#delete">(delete)</a></li>
+	      <li><a class="add" href="#add">add another key</a></li>
+	    </ul>
+	  </div><!--! .simple-corner -->
+	</div><!--! .grid -->
+      </div><!--! .container -->
+    </body>
 </html>

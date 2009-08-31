@@ -169,6 +169,10 @@ ul.form li.msg a {
     text-decoration:none;
 }
 
+ul.form li.msg a:hover {
+    font-weight:bold;
+}
+
 ul.form input, ul.form span, ul.form label {
     font-size: 28px;
     color: #8a8984;
@@ -234,4 +238,37 @@ div.form-container {
     background: url(/path/to/image/too_cool.png) bottom right no-repeat;
     text-indent: -999em;
     text-decoration: none;
+}
+.simple-corner {
+    background-color: #FFF;
+    border: 1px solid #D0D1CA;
+    text-align:center;
+    margin-bottom:4px;
+    -webkit-border-radius: 10px 10px;
+    -moz-border-radius: 10px 10px;
+}
+.simple-corner h1 {
+    color:#888a85;
+    font-size: 20px;
+}
+
+.simple-corner h2 {
+    margin:0;
+    color:#888a85;
+    font-size: 16px;
+}
+
+ul.litle-form {
+    list-style:none;
+    margin-right: 15px;
+}
+
+ul.litle-form .edit {
+    color:#204a87;
+}
+ul.litle-form .delete {
+    color:#ef2929;
+}
+ul.litle-form .add {
+    color:#f57900;
 }
