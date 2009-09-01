@@ -172,6 +172,7 @@ def test_save_hashes_password_if_does_not_start_with_hash():
         uuid = 'my-uuid'
         password = 'does not start with hash:'
         make_hashed_password = mocker.CreateMockAnything()
+        update_authorized_keys = mocker.CreateMockAnything()
         def get_repository_dir(self):
             return '/my/repo/dir'
 
@@ -179,7 +180,7 @@ def test_save_hashes_password_if_does_not_start_with_hash():
     UserStub.make_hashed_password('my@email.com',
                                   'does not start with hash:'). \
         AndReturn('my-hash')
-
+    UserStub.update_authorized_keys()
     user = UserStub()
 
     session_mock = mocker.CreateMockAnything()
@@ -208,10 +209,12 @@ def test_save_doesnt_touch_password_if_already_hashed():
         uuid = 'my-uuid'
         password = 'hash:my-hash'
         make_hashed_password = mocker.CreateMockAnything()
+        update_authorized_keys = mocker.CreateMockAnything()
         def get_repository_dir(self):
             return '/my/repo/dir'
 
     UserStub.fs.exists('/my/repo/dir').AndReturn(True)
+    UserStub.update_authorized_keys()
 
     user = UserStub()
 
@@ -241,12 +244,14 @@ def test_save_should_create_user_repo_dir():
         uuid = 'my-uuid'
         password = 'hash:my-hash'
         make_hashed_password = mocker.CreateMockAnything()
+        update_authorized_keys = mocker.CreateMockAnything()
+
         def get_repository_dir(self):
             return '/my/repo/dir'
 
     UserStub.fs.exists('/my/repo/dir').AndReturn(False)
     UserStub.fs.mkdir('/my/repo/dir')
-
+    UserStub.update_authorized_keys()
     user = UserStub()
 
     session_mock = mocker.CreateMockAnything()
@@ -272,6 +277,7 @@ def test_authenticate_returns_user_if_found():
         email = 'my@email.com'
         password = 'hash:my-hash'
         make_hashed_password = mocker.CreateMockAnything()
+        update_authorized_keys = mocker.CreateMockAnything()
 
     UserStub.make_hashed_password('my@email.com', 'some-password'). \
         AndReturn('hash:my-hash')

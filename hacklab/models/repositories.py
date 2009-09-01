@@ -119,7 +119,7 @@ class UserRepository(Repository):
 
     @classmethod
     def update_authorized_keys(cls):
-        temp_filename = "%s.keys" % unicode(uuid.uuid4())
+        temp_filename = "/tmp/hacklab.%s.keys" % unicode(uuid.uuid4())
         temp_file = FileSystem.open(temp_filename, 'w')
         session = meta.get_session()
         users = session.query(cls).all()
