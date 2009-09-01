@@ -15,13 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import md5
 import sha
 import uuid
+import string
+import shutil
 import cherrypy
 
 from sponge.core.io import FileSystem
 from hacklab.models import meta
+
+ENTRY_TEMPLATE = string.Template(u'command="hacklab-verify ${repos}",' \
+                                 'no-port-forwarding,' \
+                                 'no-X11-forwarding,' \
+                                 'no-agent-forwarding,' \
+                                 'no-pty ${key}')
 
 class ObjectNotFound(Exception):
     pass
@@ -90,6 +99,8 @@ class UserRepository(Repository):
         if not self.fs.exists(repodir):
             self.fs.mkdir(repodir)
 
+        self.update_authorized_keys()
+
     @classmethod
     def authenticate(cls, email, password):
         session = meta.get_session()
@@ -105,3 +116,22 @@ class UserRepository(Repository):
             return user
         else:
             raise cls.WrongPassword, 'The password is wrong'
+
+    @classmethod
+    def update_authorized_keys(cls):
+        temp_filename = "%s.keys" % unicode(uuid.uuid4())
+        temp_file = FileSystem.open(temp_filename, 'w')
+        session = meta.get_session()
+        users = session.query(cls).all()
+        data = []
+        for user in users:
+            for key in user.keys:
+                row = ENTRY_TEMPLATE.substitute({'repos': user.username,
+                                                 'key': key.data})
+                data.append(row)
+
+        temp_file.write("\n".join(data))
+        temp_file.close()
+        shutil.copy(temp_filename,
+                    os.path.expanduser('~/.ssh/authorized_keys'))
+        os.remove(temp_filename)

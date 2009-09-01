@@ -30,14 +30,14 @@ repository_base = abspath(join(root, repo_dir))
 def test_can_create_repository():
     "GitRepository.create() creates and persists a new repository"
 
-    gabriel = User.create(name=u'Gabriel Falcão',
-                          username=u'gabriel.falcao',
-                          email=u'gabriel@nacaolivre.org',
+    first = User.create(name=u'First Repo',
+                          username=u'first.repo',
+                          email=u'first@repository.org',
                           password=u'some-passwd')
 
     GitRepository.create(name=u'Hacklab Contributions',
                          description=u'Some description...',
-                         owner=gabriel,
+                         owner=first,
                          slug=u"hacklab-contrib")
 
     session = meta.get_session()
@@ -47,5 +47,5 @@ def test_can_create_repository():
     assert_equals(repository.name, u'Hacklab Contributions')
     assert_equals(repository.description, u'Some description...')
     assert_equals(repository.slug, u'hacklab-contrib')
-    assert_equals(repository.owner.username, 'gabriel.falcao')
+    assert_equals(repository.owner.username, 'first.repo')
 
