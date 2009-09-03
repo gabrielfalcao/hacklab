@@ -22,6 +22,7 @@ from sqlalchemy.orm import relation, backref
 from hacklab.models.base import Model
 from hacklab.models.repositories import Repository
 from hacklab.models.repositories import UserRepository
+from hacklab.models.repositories import GitRepoRepository
 
 class User(Model, UserRepository):
     __tablename__ = 'users'
@@ -33,7 +34,7 @@ class User(Model, UserRepository):
     def __unicode__(self):
         return "<User '%s'>" % self.name
 
-class GitRepository(Model, Repository):
+class GitRepository(Model, GitRepoRepository):
     __tablename__ = 'repositories'
     name = Column(Unicode, nullable=False)
     description = Column(Unicode)

@@ -7,11 +7,12 @@
   <xi:include href="base.html" />
     <head>
       <title>Login</title>
+      <script type="text/javascript" src="/media/js/hacklab.repository.js"></script>
     </head>
     <body>
     <div id="content" class="container_16">
       <div class="grid_10 prefix_3 fill-form">
-	<form action="/user/new" method="post" id="new-user-form">
+	<form action="/repository/new" method="post" id="new-repository-form">
 	  <div class="form-container">
 	    <ul class="form">
 	      <li class="big">
@@ -24,10 +25,6 @@
 	      <li>
 		<label for="description">description</label>
 		<input type="text" name="description" id="description" class="field" />
-	      </li>
-	      <li>
-		<label for="homepage">homepage</label>
-		<input type="text" name="homepage" id="homepage" class="field" />
 	      </li>
 	      <li>
 		<input type="submit" name="go" id="submit" class="button" value="create it!" />

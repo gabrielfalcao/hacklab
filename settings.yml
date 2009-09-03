@@ -6,6 +6,7 @@ application:
   path: hacklab/controllers.py
   static:
     /media: media
+    /repos: repositories
   template-dir: templates
 autoreload: true
 host: 0.0.0.0

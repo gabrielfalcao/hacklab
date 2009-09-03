@@ -35,10 +35,8 @@ def get_model(name):
               "perharps it hasn't been imported" % name
 
 def get_engine(**kw):
-    global __engine__
-    if not __engine__:
-        engine_string = config['sponge.extra']['database-engine']
-        __engine__ = create_engine(engine_string, **kw)
+    engine_string = config['sponge.extra']['database-engine']
+    __engine__ = create_engine(engine_string, **kw)
     return __engine__
 
 def get_session():

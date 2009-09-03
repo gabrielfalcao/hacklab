@@ -134,7 +134,7 @@ def test_user_get_repository_dir():
 
 @with_setup(create_all, drop_all)
 def test_can_add_keys_to_user():
-    "User().keys.add_public_key(description, content) adds a ssh pub key to user"
+    "User().add_public_key(description, content) adds a ssh pub key to user"
 
     user = User.create(name=u'SSH User',
                        username=u'john.doe',
@@ -144,4 +144,21 @@ def test_can_add_keys_to_user():
     user.add_public_key("laptop key", "ssh-rsa aAbBcCdD1e2f3g4h5I== john@doe.net")
     assert_equals(user.keys[0].description, "laptop key")
     assert_equals(user.keys[0].data, "ssh-rsa aAbBcCdD1e2f3g4h5I== john@doe.net")
+
+@with_setup(create_all, drop_all)
+def test_can_create_a_repository_to_user():
+    "User().create_repository(name, description) adds a new git repository to user's account"
+
+    user = User.create(name=u'Hacker #1',
+                       username=u'hacker.no1',
+                       email=u'one@hackers.net',
+                       password=u'my-password')
+
+    repo = user.create_repository("repo-one", "repo one")
+
+    assert_equals(repo.name, "repo-one")
+    assert_equals(repo.description, "repo one")
+
+    assert_equals(user.repositories[0].name, "repo-one")
+    assert_equals(user.repositories[0].description, "repo one")
 

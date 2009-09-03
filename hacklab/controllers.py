@@ -16,14 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import cherrypy
 from sponge import route, Controller, template
-from hacklab.models import User
+from hacklab.models import User, GitRepository, meta
 
 def authenticated_route(path, name=None, login_at='/login'):
     def decor(func):
-        def wrap(*args, **kw):
+        def wrap(self, *args, **kw):
             user = cherrypy.session.get('user')
             if user:
-                return func(*args, **kw)
+                return func(self, user=user, *args, **kw)
 
             pi = cherrypy.request.path_info
             raise cherrypy.HTTPRedirect("%s?redirect=%s" % (login_at, pi))
@@ -36,9 +36,17 @@ def authenticated_route(path, name=None, login_at='/login'):
 
 class UserController(Controller):
     @authenticated_route('/account')
-    def manage_account(self, **data):
-        user = cherrypy.session['user']
+    def manage_account(self, user, **data):
         return template.render_html('user/account.html', {'user': user})
+
+    @authenticated_route('/:username/:reponame')
+    def repository_page(self, user, username, reponame, **data):
+        session = meta.get_session()
+        repository = session.query(GitRepository). \
+                         filter_by(name=reponame, owner=user).first()
+
+        return template.render_html('repository/page.html',
+                                    {'repository': repository})
 
     @route('/new')
     def new_user(self, **data):
@@ -74,8 +82,14 @@ class HackLabController(Controller):
         raise cherrypy.HTTPRedirect('/user/new')
 
     @authenticated_route('/repository/new')
-    def new_repository(self):
-        user = cherrypy.session['user']
+    def new_repository(self, user, **kw):
+        if 'name' in kw:
+            name = kw['name']
+            description = kw.get('description', '')
+            repository = user.create_repository(name=name,
+                                                description=description)
+            raise cherrypy.HTTPRedirect(repository.get_permalink())
+
         return template.render_html('repository/new.html', {'user': user})
 
     @route('/login')
@@ -104,6 +118,5 @@ class HackLabController(Controller):
         return template.render_html('user/login.html', context)
 
     @authenticated_route('/dashboard')
-    def dashboard(self):
-        user = cherrypy.session['user']
+    def dashboard(self, user):
         return template.render_html('dashboard.html', {'user': user})

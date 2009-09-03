@@ -5,4 +5,9 @@
            lang="en"
            py:strip="">
   <xi:include href="../base.html" />
+    <head py:match="head" py:attrs="select('@*')">
+      ${select("link|text()")}
+      ${select("script|text()")}
+      <script py:if="defined('user')" src="/media/js/hacklab.user.js" type="text/javascript"></script>
+    </head>
 </html>

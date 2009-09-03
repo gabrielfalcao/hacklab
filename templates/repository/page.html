@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+           xmlns:py="http://genshi.edgewall.org/"
+           xmlns:xi="http://www.w3.org/2001/XInclude"
+           lang="en"
+           py:strip="">
+  <xi:include href="base.html" />
+    <head>
+      <title>Login</title>
+      <script type="text/javascript" src="/media/js/hacklab.repository.js"></script>
+    </head>
+    <body>
+    <div id="content" class="container_16">
+      <div class="grid_10 prefix_3 fill-form">
+	  <h1>${repository.name}</h1>
+	  <h2>${repository.slug}</h2>
+	  <code>
+	    git clone http://127.0.0.1:4000/repos/${repository.owner.username}/${repository.slug}
+	  </code>
+      </div><!-- end .fill-form-->
+    </div><!-- end #content-->
+  </body>
+</html>

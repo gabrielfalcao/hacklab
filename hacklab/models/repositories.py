@@ -24,6 +24,9 @@ import shutil
 import cherrypy
 
 from sponge.core.io import FileSystem
+from sponge.helpers import slugify
+from sponge.template import make_url
+
 from hacklab.models import meta
 
 ENTRY_TEMPLATE = string.Template(u'command="hacklab-verify ${repos}",' \
@@ -38,6 +41,7 @@ class ObjectNotFound(Exception):
 class Repository(object):
     NotFound = ObjectNotFound
     fs = FileSystem()
+
     @classmethod
     def create(cls, **kwargs):
         instance = cls()
@@ -52,8 +56,14 @@ class Repository(object):
             self.uuid = unicode(uuid.uuid4())
 
         session = meta.get_session()
+
+        if session.object_session(self):
+            session = session.object_session(self)
+            session.expunge(self)
+
         session.add(self)
         session.commit()
+        session.expire(self)
 
 class UserRepository(Repository):
     class WrongPassword(Exception):
@@ -65,12 +75,27 @@ class UserRepository(Repository):
                                    data=unicode(data)))
         self.save()
 
-    def get_repository_dir(self):
+    def create_repository(self, name, description):
+        GitRepository = meta.get_model('GitRepository')
+
+        title = unicode(name)
+        repo = GitRepository(name=title,
+                             slug=slugify(title),
+                             description=unicode(description),
+                             owner=self)
+        repo.save()
+
+        return repo
+
+    def get_repository_dir(self, name=''):
         root = cherrypy.config['sponge.root']
         repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
         repository_base = self.fs.join(root, repo_dir)
-        return self.fs.abspath(self.fs.join(repository_base,
+        base = self.fs.abspath(self.fs.join(repository_base,
                                             self.username))
+        if name:
+            return self.fs.join(base, "%s.git" % name)
+        return base
 
     def get_gravatar(self):
         md5_email = md5.new(self.email).hexdigest()
@@ -95,7 +120,6 @@ class UserRepository(Repository):
 
         super(UserRepository, self).save()
         repodir = self.get_repository_dir()
-        # after having a uuid, then
         if not self.fs.exists(repodir):
             self.fs.mkdir(repodir)
 
@@ -135,3 +159,16 @@ class UserRepository(Repository):
         shutil.copy(temp_filename,
                     os.path.expanduser('~/.ssh/authorized_keys'))
         os.remove(temp_filename)
+
+class GitRepoRepository(Repository):
+    def get_permalink(self):
+        return make_url('/user/%s/%s' % (self.owner.username, self.slug))
+
+    def save(self):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super(GitRepoRepository, self).save()
+        repodir = self.owner.get_repository_dir(self.slug)
+        if not self.fs.exists(repodir):
+            self.fs.mkdir(repodir)

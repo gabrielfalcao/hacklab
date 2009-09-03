@@ -9,7 +9,7 @@ clear:
 	@echo "Cleaning up repositories..."
 	@rm -rf repositories
 
-db:
+db: clear
 	@echo "Cleaning up database ..."
 	@rm -f database_hacklab.sqlite
 	@echo "Creating database ..."
