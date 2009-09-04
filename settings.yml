@@ -6,8 +6,10 @@ application:
   path: hacklab/controllers.py
   static:
     /media: media
-    /repos: repositories
   template-dir: templates
+  boot:
+    path: hacklab/startup.py
+    callable: startup
 autoreload: true
 host: 0.0.0.0
 port: 4000

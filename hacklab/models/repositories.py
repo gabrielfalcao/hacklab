@@ -19,15 +19,19 @@ import os
 import md5
 import sha
 import uuid
+import time
 import string
 import shutil
 import cherrypy
+
+from cleese import Executer
 
 from sponge.core.io import FileSystem
 from sponge.helpers import slugify
 from sponge.template import make_url
 
 from hacklab.models import meta
+
 
 ENTRY_TEMPLATE = string.Template(u'command="hacklab-verify ${repos}",' \
                                  'no-port-forwarding,' \
@@ -172,3 +176,13 @@ class GitRepoRepository(Repository):
         repodir = self.owner.get_repository_dir(self.slug)
         if not self.fs.exists(repodir):
             self.fs.mkdir(repodir)
+
+        self.fs.pushd(repodir)
+        exe = Executer('git init --bare')
+        exe.execute()
+        while exe.poll():
+            time.sleep(0.5)
+        else:
+            del exe
+
+        self.fs.popd()
