@@ -18,15 +18,11 @@ from mox import Mox
 from nose.tools import assert_equals
 from hacklab.models import repositories as rep
 
-class MetaStub(object):
-    class SessionStub(object):
-        def add(self, other):
-            pass
-        def commit(self):
-            pass
-
-    def get_session(self):
-        return self.SessionStub()
+def meta_stub(mocker):
+    session = mocker.CreateMockAnything()
+    meta = mocker.CreateMockAnything()
+    meta.get_session().AndReturn(session)
+    return meta, session
 
 def test_repository_create_setattr():
     "Repository.create() should set given attributes in a new object"
@@ -85,7 +81,7 @@ def test_repository_save_adds_uuid():
     mocker.StubOutWithMock(rep, 'uuid')
 
     old_meta = rep.meta
-    rep.meta = MetaStub()
+    rep.meta, session_mock = meta_stub(mocker)
 
     rep.uuid.uuid4().AndReturn('some-uuid')
 
@@ -93,6 +89,12 @@ def test_repository_save_adds_uuid():
         uuid = None
 
     model = ModelStub()
+
+    session_mock.object_session(model).AndReturn(False)
+    session_mock.add(model)
+    session_mock.commit()
+    session_mock.expire(model)
+
     mocker.ReplayAll()
     try:
         model.save()
@@ -105,16 +107,25 @@ def test_repository_save_adds_uuid():
 def test_repository_save_doesnt_touch():
     "Repository.save() shouldn't set a uuid if it already has one"
 
+    mocker = Mox()
+
     old_meta = rep.meta
-    rep.meta = MetaStub()
+    rep.meta, session_mock = meta_stub(mocker)
 
     class ModelStub(rep.Repository):
         uuid = 'my-uuid'
 
     model = ModelStub()
+    session_mock.object_session(model).AndReturn(False)
+    session_mock.add(model)
+    session_mock.commit()
+    session_mock.expire(model)
+
+    mocker.ReplayAll()
     try:
         model.save()
         assert_equals(model.uuid, 'my-uuid')
+        mocker.VerifyAll()
     finally:
         rep.meta = old_meta
 
@@ -130,9 +141,10 @@ def test_repository_save_adds_object_to_session_and_commits():
     model = ModelStub()
 
     session_mock = mocker.CreateMockAnything()
+    session_mock.object_session(model).AndReturn(False)
     session_mock.add(model)
     session_mock.commit()
-
+    session_mock.expire(model)
     rep.meta.get_session().AndReturn(session_mock)
 
     mocker.ReplayAll()
