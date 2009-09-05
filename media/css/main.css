@@ -52,6 +52,9 @@ a.search-button {
     height: 54px;
     margin: 12px 0 0 12px;
     background-color: #FFF;
+    background-image: url("/media/img/dude.png");
+    background-position: 3px 3px;
+    background-repeat: no-repeat;
     float:left;
 }
 
@@ -271,4 +274,45 @@ ul.litle-form .delete {
 }
 ul.litle-form .add {
     color:#f57900;
+}
+ul.litle-form label {
+    font-family: Tahoma,Helvetica,Arial,sans-serif;
+    color:#ef2929;
+    display:block;
+    font-size: 10px;
+    text-transform:lower;
+}
+#top-message {
+    position:absolute;
+    width: 100%;
+    height: 50px;
+    top:0;
+    left:0;
+    display:none;
+    background-color: black;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    opacity:0.60; -moz-opacity: 0.60;
+    khtml-opacity: .60;
+    text-align:center;
+}
+#top-message-text {
+    display:inline-block;
+    color:white;
+    padding-left: 50px;
+    font-size: 28px;
+    padding-top: 6px;
+    background-repeat:no-repeat;
+}
+#top-message-text.success {
+    background-image: url("/media/img/success.png");
+
+}
+#top-message-text.error {
+    background-image: url("/media/img/error.png");
+}
+#top-message-text.warning {
+    background-image: url("/media/img/warning.png");
+}
+
+#top-message .wrapper {
 }

@@ -25,6 +25,7 @@
 	      <li>
 		<label for="username">username</label>
 		<input type="text" name="username" id="username" class="field" value="${username}"/>
+                <label for="username" class="error" py:if="defined('error')">${error}</label>
 	      </li>
 	      <li>
 		<label for="email">email</label>

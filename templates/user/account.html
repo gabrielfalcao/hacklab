@@ -6,6 +6,7 @@
 <xi:include href="base.html" />
     <head>
       <title>${user.name}'s account details at hacklab</title>
+      <script py:if="defined('user')" src="/media/js/hacklab.user.account.js" type="text/javascript"></script>
     </head>
     <body>
       <div id="content" class="container_16">
@@ -14,11 +15,11 @@
 	    <h1>account details</h1>
 	    <hr />
 	    <h2>change password</h2>
-	    <form action="/user/change-password" method="post">
+	    <form id="change-password-form" action="/user/change-password" method="post">
 	      <ul class="litle-form">
-		<li><input class="simple-corner" type="password" name="password" value="" /></li>
-		<li><input class="simple-corner" type="password" name="confirmation" value="" /></li>
-		<li><input type="button" value="save" /></li>
+		<li><input class="simple-corner" type="password" name="password" id="password" value="" /></li>
+		<li><input class="simple-corner" type="password" name="confirm" id="confirm" value="" /></li>
+		<li><input type="submit" value="save" /></li>
 	      </ul>
 	    </form>
 	  </div><!--! .simple-corner -->

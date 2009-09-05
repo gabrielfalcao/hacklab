@@ -17,12 +17,15 @@
 import cherrypy
 from sponge import route, Controller, template
 from hacklab.models import User, GitRepository, meta
+from sqlalchemy.exc import IntegrityError
 
 def authenticated_route(path, name=None, login_at='/login'):
     def decor(func):
         def wrap(self, *args, **kw):
-            user = cherrypy.session.get('user')
-            if user:
+            session = meta.get_session()
+            user_id = cherrypy.session.get('user_id')
+            if user_id:
+                user = session.query(User).filter_by(id=user_id).first()
                 return func(self, user=user, *args, **kw)
 
             pi = cherrypy.request.path_info
@@ -35,6 +38,12 @@ def authenticated_route(path, name=None, login_at='/login'):
     return decor
 
 class UserController(Controller):
+    @authenticated_route('/change-password')
+    def change_password(self, user, **data):
+        user.password = data['password']
+        user.save()
+        return 'ok'
+
     @authenticated_route('/account')
     def manage_account(self, user, **data):
         return template.render_html('user/account.html', {'user': user})
@@ -64,15 +73,20 @@ class UserController(Controller):
                 data[k] = unicode(data[k], 'utf-8')
 
         if not needed.difference(set(data.keys())):
-            cherrypy.session['user'] = User.create(**data)
-            raise cherrypy.HTTPRedirect('/repository/new')
+            try:
+                user = User.create(**data)
+                cherrypy.session['user_id'] = user.id
+                raise cherrypy.HTTPRedirect('/user/account')
+
+            except IntegrityError, e:
+                data['error'] = 'the username already exists'
 
         return template.render_html('user/register.html', data)
 
     @route('/logout')
     def logout(self, **data):
-        if 'user' in cherrypy.session:
-            del cherrypy.session['user']
+        if 'user_id' in cherrypy.session:
+            del cherrypy.session['user_id']
 
         raise cherrypy.HTTPRedirect('/')
 
@@ -106,7 +120,7 @@ class HackLabController(Controller):
         if email and password:
             try:
                 user = User.authenticate(email, password)
-                cherrypy.session['user'] = user
+                cherrypy.session['user_id'] = user.id
                 raise cherrypy.HTTPRedirect(redirect_to)
 
             except User.NotFound, e:
