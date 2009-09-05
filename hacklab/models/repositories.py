@@ -22,13 +22,13 @@ import uuid
 import time
 import string
 import shutil
+import cleese
 import cherrypy
-
-from cleese import Executer
+import logging
 
 from sponge.core.io import FileSystem
 from sponge.helpers import slugify
-from sponge.template import make_url
+from sponge import template
 
 from hacklab.models import meta
 
@@ -166,7 +166,8 @@ class UserRepository(Repository):
 
 class GitRepoRepository(Repository):
     def get_permalink(self):
-        return make_url('/user/%s/%s' % (self.owner.username, self.slug))
+        return template.make_url('/user/%s/%s' % (self.owner.username,
+                                                  self.slug))
 
     def save(self):
         if not self.slug:
@@ -178,10 +179,12 @@ class GitRepoRepository(Repository):
             self.fs.mkdir(repodir)
 
         self.fs.pushd(repodir)
-        exe = Executer('git init --bare')
+        exe = cleese.Executer('git init --bare')
         exe.execute()
         while exe.poll():
             time.sleep(0.5)
+            logging.log('Waiting for git init ' \
+                        '--bare within %s' % repodir)
         else:
             del exe
 

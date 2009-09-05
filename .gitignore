@@ -4,3 +4,4 @@ repositories/*
 gitdaemon.pid
 .coverage
 database_hacklab.sqlite
+.sessions
