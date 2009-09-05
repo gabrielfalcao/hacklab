@@ -23,7 +23,9 @@
   <body py:match="body" py:attrs="select('@*')">
     <div id="header" class="container_16">
       <div id="top" class="grid_3">
-	<img src="/media/img/logo.png" class="logo" alt="HackLab logo" />
+	<a href="/dashboard">
+	  <img src="/media/img/logo.png" class="logo" alt="HackLab logo" />
+	</a>
       </div>
       <div id="user-box" class="grid_5" py:if="defined('user')">
 	<div id="user-pic">
