@@ -38,6 +38,7 @@ def teardown_cherrypy():
     cherrypy.config.update(old_config)
 
 def test_get_permalink():
+    "GitRepoRepository().get_permalink() should return repo's url."
     mocker = Mox()
 
     mocker.StubOutWithMock(rep, 'template')
@@ -61,7 +62,8 @@ def test_get_permalink():
     finally:
         mocker.UnsetStubs()
 
-def test_save():
+def test_save_if_repo_dir_does_not_exist():
+    "GitRepoRepository().save() when dir does not exist."
     mocker = Mox()
 
     owner_mock = mocker.CreateMockAnything()
@@ -102,7 +104,60 @@ def test_save():
 
     executer_mock = mocker.CreateMockAnything()
     executer_mock.execute()
-    executer_mock.poll().AndReturn(False)
+
+    rep.cleese.Executer('git init --bare'). \
+        AndReturn(executer_mock)
+
+    mocker.ReplayAll()
+    try:
+        git.save()
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+def test_save_if_repo_dir_already_exists():
+    "GitRepoRepository().save() when dir already exists."
+    mocker = Mox()
+
+    owner_mock = mocker.CreateMockAnything()
+    fs_mock = mocker.CreateMockAnything()
+
+    mocker.StubOutWithMock(rep, 'cleese')
+    mocker.StubOutWithMock(rep, 'meta')
+    mocker.StubOutWithMock(rep, 'uuid')
+
+    class GitRepoStub(rep.GitRepoRepository):
+        uuid = None
+        title = 'brand new slug'
+        slug = None
+        owner = owner_mock
+        fs = fs_mock
+
+    git = GitRepoStub()
+
+    owner_mock.get_repository_dir('brand-new-slug'). \
+        AndReturn('should-be-repo-dir')
+
+    fs_mock.exists('should-be-repo-dir'). \
+        AndReturn(False)
+
+
+    rep.uuid.uuid4().AndReturn('should-be-a-new-uuid')
+    session_mock = mocker.CreateMockAnything()
+    session_mock.object_session(git).AndReturn(True)
+    session_mock.object_session(git).AndReturn(session_mock)
+    session_mock.expunge(git)
+    session_mock.add(git)
+    session_mock.commit()
+    session_mock.expire(git)
+    rep.meta.get_session().AndReturn(session_mock)
+
+    fs_mock.mkdir('should-be-repo-dir')
+    fs_mock.pushd('should-be-repo-dir')
+    fs_mock.popd()
+
+    executer_mock = mocker.CreateMockAnything()
+    executer_mock.execute()
 
     rep.cleese.Executer('git init --bare'). \
         AndReturn(executer_mock)

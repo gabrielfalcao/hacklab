@@ -181,11 +181,5 @@ class GitRepoRepository(Repository):
         self.fs.pushd(repodir)
         exe = cleese.Executer('git init --bare')
         exe.execute()
-        while exe.poll():
-            time.sleep(0.5)
-            logging.log('Waiting for git init ' \
-                        '--bare within %s' % repodir)
-        else:
-            del exe
 
         self.fs.popd()
