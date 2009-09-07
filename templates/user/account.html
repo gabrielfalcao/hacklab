@@ -30,13 +30,39 @@
 	  <div class="simple-corner">
 	    <h1>ssh keys</h1>
 	    <hr />
-	    <ul class="litle-form">
-	      <li>ssh-rsa AAAAB3NzaC1yc2EAAA <a class="edit" href="#edit">(edit)</a><a class="delete" href="#delete">(delete)</a></li>
-	      <li>key of work laptop <a class="edit" href="#edit">(edit)</a><a class="delete" href="#delete">(delete)</a></li>
-	      <li><a class="add" href="#add">add another key</a></li>
+	    <ul class="litle-form" id="key-list">
+	      <li class="template">
+		<span class="text"></span>
+		<a class="edit-key" href="#edit" id="edit:">(edit)</a>
+		<a class="delete-key" href="#delete" id="delete:">(delete)</a>
+	      </li>
+
+	      <li py:for="key in user.keys">
+		${key.description}
+		<a class="edit-key" href="#edit" id="edit:${key.uuid}">(edit)</a>
+		<a class="delete-key" href="#delete" id="delete:${key.uuid}">(delete)</a>
+	      </li>
+
+	      <li py:if="len(user.keys) > 0"><a class="add" id="add-ssh-key" href="#add">add another key</a></li>
+	      <li py:if="len(user.keys) == 0"><a class="add" id="add-ssh-key" href="#add">add a key</a></li>
 	    </ul>
 	  </div><!--! .simple-corner -->
 	</div><!--! .grid -->
       </div><!--! .container -->
+      <div id="add-key-box">
+	<form id="add-key-form" action="/user/add-key" method="post">
+	  <ul class="big-form">
+	    <li>
+	      <label for="description">description</label>
+	      <input class="simple-corner large" type="text" name="description" id="description" value="" />
+	    </li>
+	    <li>
+	      <label for="key">key</label>
+	      <textarea rows="5" cols="24" class="simple-corner" name="key" id="key" value=""></textarea>
+	    </li>
+	    <li><input type="submit" value="done :)" /></li>
+	  </ul>
+	</form>
+      </div>
     </body>
 </html>

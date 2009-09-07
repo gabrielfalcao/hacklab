@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import cherrypy
+import simplejson
+import traceback
 from sponge import route, Controller, template
 from hacklab.models import User, GitRepository, meta
 from sqlalchemy.exc import IntegrityError
@@ -24,8 +26,11 @@ def authenticated_route(path, name=None, login_at='/login'):
         def wrap(self, *args, **kw):
             session = meta.get_session()
             user_id = cherrypy.session.get('user_id')
+            user = None
             if user_id:
                 user = session.query(User).filter_by(id=user_id).first()
+
+            if user:
                 return func(self, user=user, *args, **kw)
 
             pi = cherrypy.request.path_info
@@ -37,12 +42,60 @@ def authenticated_route(path, name=None, login_at='/login'):
 
     return decor
 
+def ajax_error(message, exception=None):
+    if exception:
+        details = traceback.format_exc(exception)
+    else:
+        details = None
+
+    d = {'error': message,
+         'details': details}
+
+    return simplejson.dumps(d)
+def json_response(data):
+    cherrypy.response.headers['Content-Type'] = 'text/json'
+    return simplejson.dumps(data)
+
+def contains_all(data, *params):
+    ok = True
+    for item in params:
+        if not item in data:
+            ok = False
+            break
+
+        if not data[item]:
+            ok = False
+            break
+
+    return ok
+
 class UserController(Controller):
+    @authenticated_route('/json')
+    def as_json(self, user, **data):
+        d = user.as_dict()
+        import pdb; pdb.set_trace()
+        return simplejson.dumps(d)
+
     @authenticated_route('/change-password')
     def change_password(self, user, **data):
-        user.password = data['password']
-        user.save()
-        return 'ok'
+        if contains_all(data, 'password', 'confirm'):
+            user.password = data['password']
+            user.save()
+            return simplejson.dumps(user.as_dict())
+
+        msg = 'you must provide a password and a confirmation'
+        return ajax_error(msg, ValueError(msg))
+
+    @authenticated_route('/add-key')
+    def add_key(self, user, **data):
+        if contains_all(data, 'key', 'description'):
+            desc = data['description']
+            key_data = data['key']
+            key = user.add_public_key(desc, key_data)
+            return simplejson.dumps(key.as_dict())
+
+        msg = 'you must provide a description and a key'
+        return ajax_error(msg, ValueError(msg))
 
     @authenticated_route('/account')
     def manage_account(self, user, **data):

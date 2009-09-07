@@ -19,12 +19,10 @@ import os
 import md5
 import sha
 import uuid
-import time
 import string
 import shutil
 import cleese
 import cherrypy
-import logging
 
 from sponge.core.io import FileSystem
 from sponge.helpers import slugify
@@ -45,6 +43,18 @@ class ObjectNotFound(Exception):
 class Repository(object):
     NotFound = ObjectNotFound
     fs = FileSystem()
+
+    def as_dict(self):
+        items = {}
+        for attrname in dir(self):
+            if attrname.startswith("_"):
+                continue
+
+            attr = getattr(self, attrname)
+            if isinstance(attr, (basestring, int, float, list)):
+                items[attrname] = attr
+
+        return items
 
     @classmethod
     def create(cls, **kwargs):
@@ -75,9 +85,11 @@ class UserRepository(Repository):
 
     def add_public_key(self, description, data):
         PublicKey = meta.get_model('PublicKey')
-        self.keys.append(PublicKey(description=unicode(description),
-                                   data=unicode(data)))
-        self.save()
+        key = PublicKey(owner=self)
+        key.description = unicode(description)
+        key.data = unicode(data)
+        key.save()
+        return key
 
     def create_repository(self, name, description):
         GitRepository = meta.get_model('GitRepository')
@@ -113,6 +125,13 @@ class UserRepository(Repository):
     @property
     def total_of_repositories(self):
         cls = meta.get_model('GitRepository')
+        session = meta.get_session()
+        total = session.query(cls).filter_by(owner=self).count()
+        return total
+
+    @property
+    def total_of_keys(self):
+        cls = meta.get_model('PublicKey')
         session = meta.get_session()
         total = session.query(cls).filter_by(owner=self).count()
         return total

@@ -1,5 +1,21 @@
 $.extend({
     hacklab: {
+        parseJSON: function (text){
+            return eval("(" + text + ")");
+        },
+        handleResponse: function (text) {
+            var data = this.parseJSON(text);
+
+            if (data.error) {
+                $.shout('message-user', {
+                            text: data.error,
+                            type: error,
+                            timeout: 7
+                        });
+                return null;
+            }
+            return data
+        }
     }
 });
 
