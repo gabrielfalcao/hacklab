@@ -70,18 +70,12 @@ def contains_all(data, *params):
     return ok
 
 class UserController(Controller):
-    @authenticated_route('/json')
-    def as_json(self, user, **data):
-        d = user.as_dict()
-        import pdb; pdb.set_trace()
-        return simplejson.dumps(d)
-
     @authenticated_route('/change-password')
     def change_password(self, user, **data):
         if contains_all(data, 'password', 'confirm'):
             user.password = data['password']
             user.save()
-            return simplejson.dumps(user.as_dict())
+            return json_response(user.as_dict())
 
         msg = 'you must provide a password and a confirmation'
         return ajax_error(msg, ValueError(msg))
@@ -92,7 +86,7 @@ class UserController(Controller):
             desc = data['description']
             key_data = data['key']
             key = user.add_public_key(desc, key_data)
-            return simplejson.dumps(key.as_dict())
+            return json_response(key.as_dict())
 
         msg = 'you must provide a description and a key'
         return ajax_error(msg, ValueError(msg))

@@ -1,10 +1,10 @@
 $(function (){
       $("#total-of-keys").hear('ssh-key-added',
-                       function ($self, key){
-                           var total = $self.text();
-                           var number = parseInt(total) + 1;
-                           $self.text(number);
-                       }
+                               function ($self, key){
+                                   var total = $self.text();
+                                   var number = parseInt(total) + 1;
+                                   $self.text(number);
+                               }
       );
       $("#key-list").hear('ssh-key-added',
                           function ($self, key){

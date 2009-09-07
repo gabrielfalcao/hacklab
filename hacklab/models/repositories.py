@@ -51,8 +51,10 @@ class Repository(object):
                 continue
 
             attr = getattr(self, attrname)
-            if isinstance(attr, (basestring, int, float, list)):
+            if isinstance(attr, (basestring, int, float)):
                 items[attrname] = attr
+            if isinstance(attr, list):
+                items[attrname] = [x.as_dict() for x in attr]
 
         return items
 
