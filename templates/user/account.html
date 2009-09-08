@@ -7,6 +7,17 @@
     <head>
       <title>${user.name}'s account details at hacklab</title>
       <script py:if="defined('user')" src="/media/js/hacklab.user.account.js" type="text/javascript"></script>
+      <script py:if="user.total_of_keys == -1">
+	$(function(){
+	  $("#first-use").dialog({
+	      draggable: true,
+	      resizable: true,
+	      width: '600px',
+	      modal: true,
+	      title: "SSH key issue"
+	  });
+	});
+      </script>
     </head>
     <body>
       <div id="content" class="container_16">
@@ -63,6 +74,10 @@
 	    <li><input type="submit" value="done :)" /></li>
 	  </ul>
 	</form>
+      </div>
+      <div id="first-use" class="template" py:if="user.total_of_keys == 0">
+	<h1>First access ?</h1>
+	<p>To achieve push permission, you need to send, at loasds</p>
       </div>
     </body>
 </html>

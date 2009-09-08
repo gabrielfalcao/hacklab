@@ -138,6 +138,15 @@ class UserController(Controller):
         raise cherrypy.HTTPRedirect('/')
 
 class HackLabController(Controller):
+    @route('/:username/:reponame/json')
+    def explore(self, username, reponame, **data):
+        d = {}
+        session = meta.get_session()
+        user = session.query(User).filter_by(username=username).first()
+        reponame = session.query(GitRepository).filter_by(owner=user, name=reponame).first()
+        import pdb; pdb.set_trace()
+        return json_response(d)
+
     @route('/')
     def index(self):
         raise cherrypy.HTTPRedirect('/user/new')
