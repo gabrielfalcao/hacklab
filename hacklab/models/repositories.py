@@ -70,7 +70,8 @@ class Repository(object):
     def delete(self):
         session = meta.get_session()
         User = meta.get_model('User')
-        total = session.query(User).filter_by(uuid=self.uuid).delete()
+        session.query(User).filter_by(id=self.id,
+                                      uuid=self.uuid).delete()
         session.commit()
 
     def save(self):

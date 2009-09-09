@@ -153,3 +153,33 @@ def test_repository_save_adds_object_to_session_and_commits():
         mocker.VerifyAll()
     finally:
         mocker.UnsetStubs()
+
+def test_repository_delete_does_commit():
+    "Repository.delete() should delete object and commit session."
+
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'meta')
+
+    class ModelStub(rep.Repository):
+        id = 'should-be-id'
+        uuid = 'should-be-uuid'
+
+    model = ModelStub()
+
+    query_mock = mocker.CreateMockAnything()
+    query_mock.filter_by(id='should-be-id',
+                         uuid='should-be-uuid').AndReturn(query_mock)
+    query_mock.delete()
+
+    session_mock = mocker.CreateMockAnything()
+    session_mock.query(ModelStub).AndReturn(query_mock)
+    session_mock.commit()
+
+    rep.meta.get_session().AndReturn(session_mock)
+    rep.meta.get_model('User').AndReturn(ModelStub)
+    mocker.ReplayAll()
+    try:
+        model.delete()
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
