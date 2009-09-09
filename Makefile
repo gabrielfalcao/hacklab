@@ -23,7 +23,7 @@ unit:
 	@echo "Running unit tests ..."
 	@$(nosecmd) tests/unit
 
-functional: db
+functional:
 	@echo "Running functional tests ..."
 	@$(nosecmd) tests/functional
 

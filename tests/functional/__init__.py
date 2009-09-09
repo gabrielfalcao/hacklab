@@ -11,3 +11,4 @@ settings_path = join(root_dir, 'settings.yml')
 yml = yaml.load(open(settings_path).read())
 
 SpongeConfig(cherrypy.config, ConfigValidator(yml)).setup_all(root_dir)
+
