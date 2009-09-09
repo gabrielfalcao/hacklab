@@ -59,3 +59,22 @@ def test_ajax_error_serializes_details_into_json_data():
     assert_equals(got,
                   '{"details": "the test must not break", ' \
                   '"error": "something went wrong"}')
+
+def test_contains_returns_false_if_some_parameter_is_missing():
+    "contains_all() returns False if some parameter is missing"
+    data = {'name': 'John Doe'}
+    assert controllers.contains_all(data, 'name', 'email') is False
+
+def test_contains_returns_false_if_some_parameter_is_false():
+    "contains_all() returns False if some parameter is empty or false"
+    data = {'name': 'John Doe', 'email': ''}
+    assert controllers.contains_all(data, 'name', 'email') is False
+    data = {'name': 'John Doe', 'email': None}
+    assert controllers.contains_all(data, 'name', 'email') is False
+    data = {'name': 'John Doe', 'age': 0}
+    assert controllers.contains_all(data, 'name', 'age') is False
+
+def test_contains_returns_true():
+    "contains_all() returns True if all parameters are filled"
+    data = {'name': 'John Doe', 'email': 'john@doe.net'}
+    assert controllers.contains_all(data, 'name', 'email') is True
