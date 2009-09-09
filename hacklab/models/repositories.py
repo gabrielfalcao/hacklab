@@ -91,6 +91,7 @@ class UserRepository(Repository):
         key.description = unicode(description)
         key.data = unicode(data)
         key.save()
+        self.update_authorized_keys()
         return key
 
     def create_repository(self, name, description):

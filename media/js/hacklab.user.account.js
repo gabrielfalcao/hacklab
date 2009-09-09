@@ -1,35 +1,36 @@
 $(function (){
-      $("#total-of-keys").hear('ssh-key-added',
-                               function ($self, key){
-                                   var total = $self.text();
-                                   var number = parseInt(total) + 1;
-                                   $self.text(number);
-                               }
-      );
-      $("#key-list").hear('ssh-key-added',
-                          function ($self, key){
-                              $list = $self.find('li.template').clone(true);
-                              $list.find("span.text").text(key.description);
-                              $list.find("a.edit-key").attr("id", "edit:" + key.uuid);
-                              $list.find("a.delete-key").attr("id", "delete:" + key.uuid);
-                              $list.removeClass("template");
-                              $self.prepend($list);
-                          }
-      );
+                $("#total-of-keys").hear('ssh-key-added',
+                                         function ($self, key){
+                                             var total = $self.text();
+                                             var number = parseInt(total) + 1;
+                                             $self.text(number);
+                                         }
+                                        );
+                $("#key-list").hear('ssh-key-added',
+                                    function ($self, key){
+                                        $list = $self.find('li.template').clone(true);
+                                        $list.find("span.text").text(key.description);
+                                        $list.find("a.edit-key").attr("id", "edit:" + key.uuid);
+                                        $list.find("a.delete-key").attr("id", "delete:" + key.uuid);
+                                        $list.removeClass("template");
+                                        $self.prepend($list);
+                                    }
+                                   );
 
-      $("#add-ssh-key").click(
-          function (){
-              $("#add-key-box").dialog(
-                  {
-                      draggable: true,
-                      resizable: true,
-                      width: '600px',
-                      modal: true,
-                      title: "Add a public ssh key"
-                });
+                $("#add-ssh-key").live('click',
+                                       function (){
+                                           $("#add-key-box").dialog(
+                                               {
+                                                   draggable: true,
+                                                   resizable: true,
+                                                   width: '600px',
+                                                   modal: true,
+                                                   title: "Add a public ssh key"
+                                               });
 
-          }
-      );
+                                       }
+                                      );
+
 
       $("#change-password-form").validate(
           {
@@ -112,5 +113,4 @@ $(function (){
           }
       );
 
-  }
- );
+  });

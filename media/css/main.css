@@ -341,3 +341,13 @@ ul.big-form textarea, ul.big-form .large{
 .template {
     display:none;
 }
+
+.not_found h1 {
+    font-size: 60px;
+    color: #00AF4A;
+}
+
+.not_found h2 {
+    font-size: 30px;
+    color: #b04900;
+}

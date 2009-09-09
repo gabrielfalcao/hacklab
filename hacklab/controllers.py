@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
 import cherrypy
 import simplejson
 import traceback
@@ -52,8 +53,9 @@ def ajax_error(message, exception=None):
          'details': details}
 
     return simplejson.dumps(d)
+
 def json_response(data):
-    cherrypy.response.headers['Content-Type'] = 'text/json'
+    cherrypy.response.headers['Content-Type'] = 'text/plain'
     return simplejson.dumps(data)
 
 def contains_all(data, *params):
@@ -138,13 +140,46 @@ class UserController(Controller):
         raise cherrypy.HTTPRedirect('/')
 
 class HackLabController(Controller):
-    @route('/:username/:reponame/json')
-    def explore(self, username, reponame, **data):
+    @route('/explore/:username/:reponame/*(path)')
+    def explore(self, username, reponame, path, **data):
         d = {}
         session = meta.get_session()
         user = session.query(User).filter_by(username=username).first()
-        reponame = session.query(GitRepository).filter_by(owner=user, name=reponame).first()
+        if not user:
+            cherrypy.response.status = 404
+            return template.render_html('user/not_found.html',
+                                        {'username': username})
+
+        repo = session.query(GitRepository). \
+               filter_by(owner=user, name=reponame).first()
+        if not repo:
+            cherrypy.response.status = 404
+            return template.render_html('repository/not_found.html',
+                                        {'reponame': reponame})
+
         import pdb; pdb.set_trace()
+        return json_response(d)
+
+    @route('/explore/:username/:reponame')
+    def repo_page(self, username, reponame, **data):
+        session = meta.get_session()
+        user = session.query(User).filter_by(username=username).first()
+        if not user:
+            cherrypy.response.status = 404
+            return template.render_html('user/not_found.html',
+                                        {'username': username})
+
+        repo = session.query(GitRepository). \
+               filter_by(owner=user, name=reponame).first()
+        if not repo:
+            cherrypy.response.status = 404
+            return template.render_html('repository/not_found.html',
+                                        {'reponame': reponame})
+
+
+        repopath = user.get_repository_dir(reponame)
+        git_dir = user.get_repository_dir("%s/.git" % repopath)
+        d = dict([(x, [y,z]) for x,y,z in os.walk(repopath)])
         return json_response(d)
 
     @route('/')
