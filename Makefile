@@ -8,10 +8,11 @@ clear:
 	@find . -name '*.pyc' -exec rm -rf {} \;
 	@echo "Cleaning up repositories..."
 	@rm -rf repositories
+	@echo "Cleaning up database file..."
+	@rm -f database_hacklab.sqlite*
 
 db: clear
 	@echo "Cleaning up database ..."
-	@rm -f database_hacklab.sqlite
 	@echo "Creating database ..."
 	@python -c 'import db;db.create_all()'
 
@@ -23,7 +24,7 @@ unit:
 	@echo "Running unit tests ..."
 	@$(nosecmd) tests/unit
 
-functional:
+functional: clear
 	@echo "Running functional tests ..."
 	@$(nosecmd) tests/functional
 

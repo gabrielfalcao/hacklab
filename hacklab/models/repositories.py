@@ -67,6 +67,11 @@ class Repository(object):
         instance.save()
         return instance
 
+    def delete(self):
+        session = meta.get_session()
+        User = meta.get_model('User')
+        total = session.query(User).filter_by(uuid=self.uuid).delete()
+
     def save(self):
         if not self.uuid:
             self.uuid = unicode(uuid.uuid4())

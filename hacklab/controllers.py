@@ -17,7 +17,6 @@
 import os
 import cherrypy
 import simplejson
-import traceback
 from sponge import route, Controller, template
 from hacklab.models import User, GitRepository, meta
 from sqlalchemy.exc import IntegrityError
