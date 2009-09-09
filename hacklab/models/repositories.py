@@ -71,6 +71,7 @@ class Repository(object):
         session = meta.get_session()
         User = meta.get_model('User')
         total = session.query(User).filter_by(uuid=self.uuid).delete()
+        session.commit()
 
     def save(self):
         if not self.uuid:
