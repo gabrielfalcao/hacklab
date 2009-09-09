@@ -87,9 +87,9 @@ class UserRepository(Repository):
 
     def add_public_key(self, description, data):
         PublicKey = meta.get_model('PublicKey')
-        key = PublicKey(owner=self)
-        key.description = unicode(description)
-        key.data = unicode(data)
+        key = PublicKey(owner=self,
+                        description=unicode(description),
+                        data=unicode(data))
         key.save()
         self.update_authorized_keys()
         return key

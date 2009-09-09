@@ -85,56 +85,89 @@ def test_get_repository_dir():
     mocker.VerifyAll()
 
 
-def test_add_public_key_appends_pubkeymodel():
-    "UserRepository().add_public_key() should add PublicKey to user.keys"
+def test_add_public_key_creates_a_new_public_key_model():
+    "UserRepository().add_public_key() creates a new PublicKey model"
     mocker = Mox()
 
     mocker.StubOutWithMock(rep, 'meta')
 
+    class UserStub(rep.UserRepository):
+        def update_authorized_keys(self):
+            pass
+    user = UserStub()
+
+    pubkey_mock = mocker.CreateMockAnything()
+    pubkey_mock.save()
+
     pubkey_model_mock = mocker.CreateMockAnything()
     pubkey_model_mock(description=u'my description',
-                      data=u'my-ssh-key-data'). \
-        AndReturn('should-be-pubkey-model-object')
+                      data=u'my-ssh-key-data',
+                      owner=user). \
+        AndReturn(pubkey_mock)
     rep.meta.get_model('PublicKey').AndReturn(pubkey_model_mock)
 
-    class UserStub(rep.UserRepository):
-        keys = []
-        def save(self):
-            pass
-
-    user = UserStub()
     mocker.ReplayAll()
-    expected = 'http://www.gravatar.com/avatar/should-be-md5-of-email.jpg'
     try:
         user.add_public_key('my description', 'my-ssh-key-data')
-        assert_equals(user.keys[0], 'should-be-pubkey-model-object')
         mocker.VerifyAll()
     finally:
         mocker.UnsetStubs()
 
-def test_add_public_key_saves_the_model():
-    "UserRepository().add_public_key() should save the model"
+def test_add_public_key_updates_authorized_keys():
+    "UserRepository().add_public_key() should update authorized keys"
     mocker = Mox()
 
     mocker.StubOutWithMock(rep, 'meta')
 
+    class UserStub(rep.UserRepository):
+        update_authorized_keys = mocker.CreateMockAnything()
+
+    UserStub.update_authorized_keys()
+    user = UserStub()
+
+    pubkey_mock = mocker.CreateMockAnything()
+    pubkey_mock.save()
+
     pubkey_model_mock = mocker.CreateMockAnything()
     pubkey_model_mock(description=u'my description',
-                      data=u'my-ssh-key-data'). \
-        AndReturn('should-be-pubkey-model-object')
+                      data=u'my-ssh-key-data',
+                      owner=user). \
+        AndReturn(pubkey_mock)
     rep.meta.get_model('PublicKey').AndReturn(pubkey_model_mock)
 
-    class UserStub(rep.UserRepository):
-        keys = []
-        save = mocker.CreateMockAnything()
-
-    UserStub.save()
-    user = UserStub()
     mocker.ReplayAll()
-    expected = 'http://www.gravatar.com/avatar/should-be-md5-of-email.jpg'
     try:
         user.add_public_key('my description', 'my-ssh-key-data')
-        assert_equals(user.keys[0], 'should-be-pubkey-model-object')
+        mocker.VerifyAll()
+    finally:
+        mocker.UnsetStubs()
+
+def test_add_public_key_returns_the_key_object():
+    "UserRepository().add_public_key() should return the public key model"
+    mocker = Mox()
+
+    mocker.StubOutWithMock(rep, 'meta')
+
+    class UserStub(rep.UserRepository):
+        def update_authorized_keys(self):
+            pass
+
+    user = UserStub()
+
+    pubkey_mock = mocker.CreateMockAnything()
+    pubkey_mock.save()
+
+    pubkey_model_mock = mocker.CreateMockAnything()
+    pubkey_model_mock(description=u'my description',
+                      data=u'my-ssh-key-data',
+                      owner=user). \
+        AndReturn(pubkey_mock)
+    rep.meta.get_model('PublicKey').AndReturn(pubkey_model_mock)
+
+    mocker.ReplayAll()
+    try:
+        got = user.add_public_key('my description', 'my-ssh-key-data')
+        assert_equals(got, pubkey_mock)
         mocker.VerifyAll()
     finally:
         mocker.UnsetStubs()
