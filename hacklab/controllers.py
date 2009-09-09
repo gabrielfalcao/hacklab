@@ -43,20 +43,15 @@ def authenticated_route(path, name=None, login_at='/login'):
 
     return decor
 
-def ajax_error(message, exception=None):
-    if exception:
-        details = traceback.format_exc(exception)
-    else:
-        details = None
-
-    d = {'error': message,
-         'details': details}
-
-    return simplejson.dumps(d)
-
 def json_response(data):
     cherrypy.response.headers['Content-Type'] = 'text/plain'
     return simplejson.dumps(data)
+
+def ajax_error(message, details=None):
+    d = {'error': message,
+         'details': details}
+
+    return json_response(d)
 
 def contains_all(data, *params):
     ok = True
