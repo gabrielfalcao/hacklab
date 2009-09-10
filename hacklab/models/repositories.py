@@ -69,9 +69,8 @@ class Repository(object):
 
     def delete(self):
         session = meta.get_session()
-        User = meta.get_model('User')
-        session.query(User).filter_by(id=self.id,
-                                      uuid=self.uuid).delete()
+        session.query(self.__class__).filter_by(id=self.id,
+                                                uuid=self.uuid).delete()
         session.commit()
 
     def save(self):

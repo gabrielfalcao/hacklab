@@ -176,7 +176,6 @@ def test_repository_delete_does_commit():
     session_mock.commit()
 
     rep.meta.get_session().AndReturn(session_mock)
-    rep.meta.get_model('User').AndReturn(ModelStub)
     mocker.ReplayAll()
     try:
         model.delete()

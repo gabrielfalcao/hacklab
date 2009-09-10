@@ -18,7 +18,10 @@ import os
 import cherrypy
 import simplejson
 from sponge import route, Controller, template
-from hacklab.models import User, GitRepository, meta
+from hacklab.models import User
+from hacklab.models import GitRepository
+from hacklab.models import PublicKey
+from hacklab.models import meta
 from sqlalchemy.exc import IntegrityError
 
 def authenticated_route(path, name=None, login_at='/login'):
@@ -66,6 +69,15 @@ def contains_all(data, *params):
     return ok
 
 class UserController(Controller):
+    @authenticated_route('/key/:uuid/delete')
+    def delete_key(self, user, uuid, **data):
+        session = meta.get_session()
+        key = session.query(PublicKey). \
+              filter_by(uuid=uuid).first()
+        d = key.as_dict()
+        key.delete()
+        return json_response(d)
+
     @authenticated_route('/change-password')
     def change_password(self, user, **data):
         if contains_all(data, 'password', 'confirm'):
@@ -178,7 +190,7 @@ class HackLabController(Controller):
 
     @route('/')
     def index(self):
-        raise cherrypy.HTTPRedirect('/user/new')
+        raise cherrypy.HTTPRedirect('/login')
 
     @authenticated_route('/repository/new')
     def new_repository(self, user, **kw):
