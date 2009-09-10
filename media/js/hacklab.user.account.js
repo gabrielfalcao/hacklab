@@ -25,6 +25,23 @@ $(function (){
           }
       );
 
+      $(".edit-key").live(
+          'click',
+          function (){
+              var almostKeyUUID = $(this).attr("id");
+              var keyUUID = /edit[:]([a-z0-9-]+)/.exec(almostKeyUUID)[1];
+              $.hacklab.request({
+                         url: "/user/key/" + keyUUID + "/json",
+                         success: function(data, textStatus) {
+                             $.shout('ssh-key-edited', data);
+                             $.shout('message-user', { text: 'key edited successfully!' });
+                         }
+                     });
+
+              return false;
+          }
+      );
+
       $("#change-password-form").hear('password-changed', function ($self, data){
                                           $self.resetForm();
 
@@ -163,5 +180,13 @@ $(function (){
               }
           }
       );
-
+      $("#create-new-repos").live(
+          'click',
+          function (){
+              $("#create-new-repos-div").hide(
+                  'drop', {'direction': 'up'}, 'fast',
+                  function () {
+                      $("#save-new-repos-div").show('drop', {'direction': 'down'}, 'fast');
+                  });
+          });
   });

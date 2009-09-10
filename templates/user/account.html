@@ -64,8 +64,16 @@
 		  <span class="owner">Gabriel</span>
 		</div>
 	      </li>
-	      <li>
-		<a href="/repository/new">Create a new one</a>
+	      <li id="create-new-repos-div">
+		  <a href="#new-repos" id="create-new-repos">Create a new one</a>
+	      </li>
+	      <li class="big" id="save-new-repos-div">
+		<form method="post" id="form-save-new-repos" action="/repository/new/ajax">
+		  <label for="name">name</label>
+		  <input class="simple-field large" type="text" name="name" id="name" value="" />
+		  <input class="link" type="submit"  id="save-new-repos" value="ok" />
+		  <input class="link" type="button"  id="cancel-new-repos" value="cancel" />
+		</form>
 	      </li>
 	    </ul>
 	  </div><!--! .simple-corner -->

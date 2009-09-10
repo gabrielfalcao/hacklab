@@ -1,3 +1,31 @@
+jQuery.extend(jQuery.fn,
+{
+    hear: function (eventName, messageCallback) {
+        return this.each(function (rules, messages, success, formOptions){
+                             $(this).validate(
+                                 {
+                                     rules: rules,
+                                     messages: messages,
+                                     submitHandler: function (form) {
+                                         $(form).ajaxSubmit(
+                                             $.extend(
+                                                 formOptions,
+                                                 {
+                                                     success: function (textStatus, other) {
+                                                         var data = $.hacklab.handleResponse(textStatus);
+                                                         if (success) {
+                                                             success(data);
+                                                         }
+                                                     }
+                                                 }
+                                             );
+                                         );
+                                     }
+                                 }
+                             );
+                         });
+    }
+}
 $.extend({
     hacklab: {
         request: function (options) {
@@ -66,4 +94,6 @@ $(function(){
                                             });
                              });
 
+
 });
+

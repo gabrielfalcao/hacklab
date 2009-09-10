@@ -246,6 +246,13 @@ div.form-container {
     text-indent: -999em;
     text-decoration: none;
 }
+
+.simple-field {
+    background-color: #FFF;
+    border: 1px solid #D0D1CA;
+    text-align:center;
+    margin-bottom:4px;
+}
 .simple-corner {
     background-color: #FFF;
     border: 1px solid #D0D1CA;
@@ -370,8 +377,24 @@ ul.big-form textarea, ul.big-form .large{
     clear:both;
 }
 
+#user-repository-list li.big{
+    height: 24px;
+    font-size: 12px;
+    border: 1px solid #4e9a06;
+    background: #8ae234;
+    padding: 3px 0 0 0;
+}
+
+#user-repository-list li.big input{
+    font-size: 12px;
+}
+
 #user-repository-list li:hover{
     background: #fce94f;
+}
+
+#user-repository-list li.big:hover{
+    background: #8ae234;
 }
 
 #user-repository-list .title {
@@ -396,3 +419,16 @@ ul.big-form textarea, ul.big-form .large{
     color: #a40000;
 }
 
+#user-repository-list input.link {
+    margin-top: 2px;
+    color: #2e3436;
+    background:transparent;
+    border:0;
+}
+
+#save-new-repos-div {
+    display:none;
+}
+#create-new-repos {
+
+}
