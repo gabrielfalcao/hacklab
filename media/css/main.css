@@ -356,3 +356,43 @@ ul.big-form textarea, ul.big-form .large{
 .left {
     float:left;
 }
+#user-repository-list a {
+    color: #2e3436;
+    text-decoration:none;
+}
+#user-repository-list li{
+    list-style: none;
+    margin: 4px;
+    border: 1px solid #edd400;
+    background: #FFF17F;
+    padding:0;
+    height: 20px;
+    clear:both;
+}
+
+#user-repository-list li:hover{
+    background: #fce94f;
+}
+
+#user-repository-list .title {
+    font-size: 17px;
+    margin: -4px 0 0 4px;
+    float:left;
+    color: #2e3436;
+}
+
+#user-repository-list .description {
+    font-size: 10px;
+    float:right;
+    margin: 3px 10px 0 0;
+    color: #2e3436;
+}
+
+#user-repository-list .description .time {
+    color: #064d99;
+}
+
+#user-repository-list .description .owner {
+    color: #a40000;
+}
+

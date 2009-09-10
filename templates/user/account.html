@@ -1,27 +1,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      lang="en">
-<xi:include href="base.html" />
+  xmlns:py="http://genshi.edgewall.org/"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  lang="en">
+  <xi:include href="base.html" />
     <head>
       <title>${user.name}'s account details at hacklab</title>
       <script py:if="defined('user')" src="/media/js/hacklab.user.account.js" type="text/javascript"></script>
       <script py:if="user.total_of_keys == -1">
 	$(function(){
-	  $("#first-use").dialog({
-	      draggable: true,
-	      resizable: true,
-	      width: '600px',
-	      modal: true,
-	      title: "SSH key issue"
-	  });
+	$("#first-use").dialog({
+	draggable: true,
+	resizable: true,
+	width: '600px',
+	modal: true,
+	title: "SSH key issue"
+	});
 	});
       </script>
     </head>
     <body>
       <div id="content" class="container_16">
-	<div class="grid_10 prefix_3">
+	<div class="grid_9">
 	  <div class="simple-corner">
 	    <h1>account details</h1>
 	    <hr />
@@ -33,14 +33,7 @@
 		<li><input type="submit" value="save" /></li>
 	      </ul>
 	    </form>
-	  </div><!--! .simple-corner -->
-	</div><!--! .grid -->
-      </div><!--! .container -->
-      <div id="content" class="container_16">
-	<div class="grid_10 prefix_3">
-	  <div class="simple-corner">
-	    <h1>ssh keys</h1>
-	    <hr />
+	    <h2>ssh keys</h2>
 	    <ul class="litle-form" id="key-list">
 	      <li class="template">
 		<span class="text"></span>
@@ -59,6 +52,25 @@
 	    </ul>
 	  </div><!--! .simple-corner -->
 	</div><!--! .grid -->
+	<div class="grid_7">
+	  <div class="simple-corner">
+	    <h1>Your repositories</h1>
+	    <ul id="user-repository-list">
+	      <li py:for="x in range(10)">
+		<div class="title"><a href="/repository/${x}">Bolacha</a></div>
+		<div class="description">last commit at
+		  <span class="time">04:29</span>
+		  by
+		  <span class="owner">Gabriel</span>
+		</div>
+	      </li>
+	      <li>
+		<a href="/repository/new">Create a new one</a>
+	      </li>
+	    </ul>
+	  </div><!--! .simple-corner -->
+	</div><!--! .grid -->
+
       </div><!--! .container -->
       <div id="add-key-box">
 	<form id="add-key-form" action="/user/add-key" method="post">
