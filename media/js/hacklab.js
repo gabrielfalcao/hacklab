@@ -1,5 +1,35 @@
 $.extend({
     hacklab: {
+        request: function (options) {
+            var self = this;
+            var originalErrorCallback = null;
+            var originalSucessCallback = null;
+            if (options.error) {
+                originalErrorCallback = options.error;
+            }
+            if (options.success) {
+                originalSuccessCallback = options.success;
+            }
+
+            var settings = {
+                success: function (data, textStatus){
+                    var json = self.handleResponse(data);
+                    return originalSuccessCallback(json, data, textStatus)
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $.shout('message-user', {
+                                text: "Oops! Something went wrong!",
+                                type: 'error'
+                            });
+                    if (typeof originalErrorCallback === 'function') {
+                        return originalErrorCallback(XMLHttpRequest, textStatus, errorThrown);
+                    }
+                    return false;
+                }
+            }
+            options = $.extend(options, settings);
+            $.ajax(options);
+        },
         parseJSON: function (text){
             return eval("(" + text + ")");
         },

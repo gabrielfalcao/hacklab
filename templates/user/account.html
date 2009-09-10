@@ -48,7 +48,7 @@
 		<a class="delete-key" href="#delete" id="delete:">(delete)</a>
 	      </li>
 
-	      <li py:for="key in user.keys">
+	      <li py:for="key in user.keys" id="${key.uuid}" class="ssh-key">
 		${key.description}
 		<a class="edit-key" href="#edit" id="edit:${key.uuid}">(edit)</a>
 		<a class="delete-key" href="#delete" id="delete:${key.uuid}">(delete)</a>

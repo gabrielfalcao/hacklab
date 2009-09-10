@@ -1,35 +1,84 @@
 $(function (){
-                $("#total-of-keys").hear('ssh-key-added',
-                                         function ($self, key){
-                                             var total = $self.text();
-                                             var number = parseInt(total) + 1;
-                                             $self.text(number);
-                                         }
-                                        );
-                $("#key-list").hear('ssh-key-added',
-                                    function ($self, key){
-                                        $list = $self.find('li.template').clone(true);
-                                        $list.find("span.text").text(key.description);
-                                        $list.find("a.edit-key").attr("id", "edit:" + key.uuid);
-                                        $list.find("a.delete-key").attr("id", "delete:" + key.uuid);
-                                        $list.removeClass("template");
-                                        $self.prepend($list);
-                                    }
-                                   );
+     $("#add-key-box").dialog(
+         {
+             autoOpen: false,
+             draggable: true,
+             resizable: true,
+             width: '600px',
+             modal: true,
+             title: "Add a public ssh key"
+         });
 
-                $("#add-ssh-key").live('click',
-                                       function (){
-                                           $("#add-key-box").dialog(
-                                               {
-                                                   draggable: true,
-                                                   resizable: true,
-                                                   width: '600px',
-                                                   modal: true,
-                                                   title: "Add a public ssh key"
-                                               });
+      $(".delete-key").live(
+          'click',
+          function (){
+              var almostKeyUUID = $(this).attr("id");
+              var keyUUID = /delete[:]([a-z0-9-]+)/.exec(almostKeyUUID)[1];
+              $.hacklab.request({
+                         url: "/user/key/" + keyUUID + "/delete",
+                         success: function(data, textStatus) {
+                             $.shout('ssh-key-deleted', data);
+                             $.shout('message-user', { text: 'key deleted successfully!' });
+                         }
+                     });
+              return false;
+          }
+      );
 
-                                       }
-                                      );
+      $("#change-password-form").hear('password-changed', function ($self, data){
+                                          $self.resetForm();
+
+                                      });
+      $("#total-of-keys").hear('ssh-key-added',
+                               function ($self, key){
+                                   var total = $self.text();
+                                   var number = parseInt(total) + 1;
+                                   $self.text(number);
+                               }
+                              );
+      $("#total-of-keys").hear('ssh-key-deleted',
+                               function ($self, key){
+                                   var total = $self.text();
+                                   var number = parseInt(total) - 1;
+                                   $self.text(number);
+                               }
+                              );
+
+      $("#key-list").hear('ssh-key-deleted',
+                          function ($self, key){
+                              $self.find("#" + key.uuid).remove();
+                              if ($self.find("li.ssh-key").length == 0) {
+                                  $("#add-ssh-key").text("add a key");
+                              } else {
+                                  $("#add-ssh-key").text("add another key");
+                              }
+                          }
+                         );
+
+      $("#key-list").hear('ssh-key-added',
+                          function ($self, key){
+                              $list = $self.find('li.template').clone(true);
+                              $list.attr("id", key.uuid);
+                              $list.find("span.text").text(key.description);
+                              $list.find("a.edit-key").attr("id", "edit:" + key.uuid);
+                              $list.find("a.delete-key").attr("id", "delete:" + key.uuid);
+                              $list.addClass("ssh-key");
+                              $list.removeClass("template");
+                              $self.prepend($list);
+                              if ($self.find("li.ssh-key").length == 0) {
+                                  $("#add-ssh-key").text("add a key");
+                              } else {
+                                  $("#add-ssh-key").text("add another key");
+                              }
+
+                          }
+                         );
+
+      $("#add-ssh-key").live('click',
+                             function (){
+                                 $("#add-key-box").dialog('open');
+                             }
+                            );
 
 
       $("#change-password-form").validate(
@@ -63,6 +112,8 @@ $(function (){
                               if (data.error) {
                                   msg = data.error;
                                   type = 'error';
+                              } else {
+                                  $.shout('password-changed', data);
                               }
 
                               $.shout('message-user', {

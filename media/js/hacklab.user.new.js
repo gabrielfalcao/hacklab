@@ -10,8 +10,7 @@ $(function (){
                     minlength: 3
                 },
                 password: {
-                    required: true,
-                    minlength: 5
+                    required: true
                 },
                 email: {
                     required: true,
@@ -22,8 +21,7 @@ $(function (){
                 name: "Please enter your name",
                 username: "Please choose a username",
                 password: {
-                    required: "Please provide a password",
-                    minlength: "Your password must be at least 5 characters long"
+                    required: "Please provide a password"
                 },
                 email: "Please enter a valid email address"
             }
