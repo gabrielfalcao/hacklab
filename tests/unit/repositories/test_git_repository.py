@@ -75,7 +75,7 @@ def test_save_if_repo_dir_does_not_exist():
 
     class GitRepoStub(rep.GitRepoRepository):
         uuid = None
-        title = 'brand new slug'
+        name = 'brand new slug'
         slug = None
         owner = owner_mock
         fs = fs_mock
@@ -128,7 +128,7 @@ def test_save_if_repo_dir_already_exists():
 
     class GitRepoStub(rep.GitRepoRepository):
         uuid = None
-        title = 'brand new slug'
+        name = 'brand new slug'
         slug = None
         owner = owner_mock
         fs = fs_mock
