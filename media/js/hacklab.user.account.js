@@ -190,4 +190,27 @@ $(function (){
                              });
               }
           );
+      $("#total-of-repositories").hear(
+          'repository-created',
+          function ($self, repository) {
+              var total = $self.text();
+              var number = parseInt(total) + 1;
+              $self.text(number);
+          }
+      );
+      $("#user-repository-list").hear(
+          'repository-created',
+          function ($self, repository){
+              $list = $self.find('li.template').clone(true);
+              $list.attr("id", repository.uuid);
+              var $link = $list.find('div.title > a');
+              $link.attr("href", repository.get_permalink);
+              $link.text(repository.name);
+              $list.find("div.description").text("no commits so far");
+              $list.addClass("repository");
+              $list.removeClass("template");
+              $self.prepend($list);
+          }
+      );
+
   });

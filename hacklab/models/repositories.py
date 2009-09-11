@@ -19,6 +19,7 @@ import os
 import md5
 import sha
 import uuid
+import types
 import string
 import shutil
 import cleese
@@ -53,6 +54,13 @@ class Repository(object):
             attr = getattr(self, attrname)
             if isinstance(attr, (basestring, int, float)):
                 items[attrname] = attr
+            if isinstance(attr, types.MethodType) and \
+                   attrname.startswith('get_'):
+                try:
+                    items[attrname] = apply(attr)
+                except TypeError, e:
+                    items[attrname] = None
+
             if isinstance(attr, list):
                 items[attrname] = [x.as_dict() for x in attr]
 
@@ -101,11 +109,12 @@ class UserRepository(Repository):
         GitRepository = meta.get_model('GitRepository')
 
         title = unicode(name)
-        repo = GitRepository(name=title,
-                             slug=slugify(title),
-                             description=unicode(description),
-                             owner=self)
-        repo.save()
+        repo = GitRepository.create(
+            name=title,
+            slug=slugify(title),
+            description=unicode(description),
+            owner=self
+        )
 
         return repo
 
