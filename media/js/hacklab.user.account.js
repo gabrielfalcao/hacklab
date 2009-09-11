@@ -1,13 +1,13 @@
 $(function (){
-     $("#add-key-box").dialog(
-         {
-             autoOpen: false,
-             draggable: true,
-             resizable: true,
-             width: '600px',
-             modal: true,
-             title: "Add a public ssh key"
-         });
+      $("#add-key-box").dialog(
+          {
+              autoOpen: false,
+              draggable: true,
+              resizable: true,
+              width: '600px',
+              modal: true,
+              title: "Add a public ssh key"
+          });
 
       $(".delete-key").live(
           'click',
@@ -15,12 +15,12 @@ $(function (){
               var almostKeyUUID = $(this).attr("id");
               var keyUUID = /delete[:]([a-z0-9-]+)/.exec(almostKeyUUID)[1];
               $.hacklab.request({
-                         url: "/user/key/" + keyUUID + "/delete",
-                         success: function(data, textStatus) {
-                             $.shout('ssh-key-deleted', data);
-                             $.shout('message-user', { text: 'key deleted successfully!' });
-                         }
-                     });
+                                    url: "/user/key/" + keyUUID + "/delete",
+                                    success: function(data, textStatus) {
+                                        $.shout('ssh-key-deleted', data);
+                                        $.shout('message-user', { text: 'key deleted successfully!' });
+                                    }
+                                });
               return false;
           }
       );
@@ -31,12 +31,12 @@ $(function (){
               var almostKeyUUID = $(this).attr("id");
               var keyUUID = /edit[:]([a-z0-9-]+)/.exec(almostKeyUUID)[1];
               $.hacklab.request({
-                         url: "/user/key/" + keyUUID + "/json",
-                         success: function(data, textStatus) {
-                             $.shout('ssh-key-edited', data);
-                             $.shout('message-user', { text: 'key edited successfully!' });
-                         }
-                     });
+                                    url: "/user/key/" + keyUUID + "/json",
+                                    success: function(data, textStatus) {
+                                        $.shout('ssh-key-edited', data);
+                                        $.shout('message-user', { text: 'key edited successfully!' });
+                                    }
+                                });
 
               return false;
           }
@@ -98,88 +98,78 @@ $(function (){
                             );
 
 
-      $("#change-password-form").validate(
+      $("#change-password-form").rockMyForm(
           {
-              rules: {
-                  password: {
-                      required: true
-                  },
-                  confirm: {
-                      required: true,
-		      equalTo: "#password"
-                  }
+              password: {
+                  required: true
               },
-              messages: {
-                  password: {
-                      required: "Please provide a password"
-                  },
-                  confirm: {
-                      required: "Please provide a confirmation",
-                      equalTo: "The passwords doesn't match"
-                  }
-              },
-              submitHandler: function(form) {
-		  $(form).ajaxSubmit(
-                      {
-                          success: function (textStatus, other) {
-                              var data = eval("(" + textStatus + ")");
-                              var msg = 'Password changed successfully!';
-                              var type = 'success';
-
-                              if (data.error) {
-                                  msg = data.error;
-                                  type = 'error';
-                              } else {
-                                  $.shout('password-changed', data);
-                              }
-
-                              $.shout('message-user', {
-                                          text: msg,
-                                          type: type,
-                                          timeout: 5
-                                      });
-                          }
-                      }
-                  );
+              confirm: {
+                  required: true,
+		  equalTo: "#password"
               }
+          },
+          {
+              password: {
+                  required: "Please provide a password"
+              },
+              confirm: {
+                  required: "Please provide a confirmation",
+                  equalTo: "The passwords doesn't match"
+              }
+          },
+          function (data, other) {
+              var msg = 'Password changed successfully!';
+              var type = 'success';
+
+              if (data.error) {
+                  msg = data.error;
+                  type = 'error';
+              } else {
+                  $.shout('password-changed', data);
+              }
+
+              $.shout('message-user', {
+                          text: msg,
+                          type: type,
+                          timeout: 5
+                      });
           }
       );
 
-      $("#add-key-form").validate(
+      $("#add-key-form").rockMyForm(
           {
-              rules: {
-                  description: {
-                      required: true
-                  },
-                  key: {
-                      required: true
-                  }
+              description: {
+                  required: true
               },
-              messages: {
-                  password: {
-                      required: "Please add a description to your key"
-                  },
-                  key: {
-                      required: "Please add your key"
-                  }
-              },
-              submitHandler: function(form) {
-		  $(form).ajaxSubmit(
-                      {
-                          success: function (textStatus, other) {
-                              var data = $.hacklab.handleResponse(textStatus);
-                              if (data) {
-                                  $.shout('message-user', { text: 'key added successfully!' });
-                                  $.shout('ssh-key-added', data);
-                                  $("#add-key-box").dialog('close');
-                                  $("#add-key-form").resetForm();
-                              }
-                          }
-                      }
-                  );
+              key: {
+                  required: true
               }
-          }
-      );
+          },
+          {
+              password: {
+                  required: "Please add a description to your key"
+              },
+              key: {
+                  required: "Please add your key"
+              }
+          },
+          function (data, other) {
+              if (data) {
+                  $.shout('message-user', { text: 'key added successfully!' });
+                  $.shout('ssh-key-added', data);
+                  $("#add-key-box").dialog('close');
+                  $("#add-key-form").resetForm();
+              }
+          });
+
+      $("#form-save-new-repos").rockMyForm(
+          {}, {},
+          function (data, other) {
+              if (data) {
+                  $.shout('message-user', { text: data.name + ' created successfully!' });
+                  $.shout('repository-created', data);
+              }
+          });
       $("#create-new-repos").live(
           'click',
           function (){
@@ -189,4 +179,15 @@ $(function (){
                       $("#save-new-repos-div").show('drop', {'direction': 'down'}, 'fast');
                   });
           });
+
+          $("#save-new-repos-div").hear(
+              'repository-created',
+              function ($self, repository) {
+                  $self.find("form").resetForm();
+
+                  $self.hide('drop', {'direction': 'up'}, 'fast', function (){
+                      $("#create-new-repos-div").show('drop', {'direction': 'down'}, 'fast');
+                             });
+              }
+          );
   });

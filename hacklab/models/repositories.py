@@ -199,7 +199,7 @@ class GitRepoRepository(Repository):
 
     def save(self):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.name)
 
         super(GitRepoRepository, self).save()
         repodir = self.owner.get_repository_dir(self.slug)
