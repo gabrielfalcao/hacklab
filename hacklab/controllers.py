@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
+
 import cherrypy
 import simplejson
 from sponge import route, Controller, template
@@ -146,9 +146,11 @@ class UserController(Controller):
         raise cherrypy.HTTPRedirect('/')
 
 class HackLabController(Controller):
-    @route('/explore/:username/:reponame/*(path)')
-    def explore(self, username, reponame, path, **data):
-        d = {}
+    @route('/explore/:username/*(path)')
+    def explore(self, username, path, **data):
+        path = path.split("/")
+        reponame = path.pop(0)
+
         session = meta.get_session()
         user = session.query(User).filter_by(username=username).first()
         if not user:
@@ -163,29 +165,7 @@ class HackLabController(Controller):
             return template.render_html('repository/not_found.html',
                                         {'reponame': reponame})
 
-        import pdb; pdb.set_trace()
-        return json_response(d)
-
-    @route('/explore/:username/:reponame')
-    def repo_page(self, username, reponame, **data):
-        session = meta.get_session()
-        user = session.query(User).filter_by(username=username).first()
-        if not user:
-            cherrypy.response.status = 404
-            return template.render_html('user/not_found.html',
-                                        {'username': username})
-
-        repo = session.query(GitRepository). \
-               filter_by(owner=user, name=reponame).first()
-        if not repo:
-            cherrypy.response.status = 404
-            return template.render_html('repository/not_found.html',
-                                        {'reponame': reponame})
-
-
-        repopath = user.get_repository_dir(reponame)
-        git_dir = user.get_repository_dir("%s/.git" % repopath)
-        d = dict([(x, [y,z]) for x,y,z in os.walk(repopath)])
+        d = repo.list_dir()
         return json_response(d)
 
     @route('/')

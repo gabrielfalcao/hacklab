@@ -1,23 +1,59 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-           xmlns:py="http://genshi.edgewall.org/"
-           xmlns:xi="http://www.w3.org/2001/XInclude"
-           lang="en"
-           py:strip="">
+  xmlns:py="http://genshi.edgewall.org/"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  lang="en"
+  py:strip="">
   <xi:include href="base.html" />
     <head>
-      <title>Login</title>
+      <title>${repository.owner.name}'s ${repository.name} at hacklab</title>
       <script type="text/javascript" src="/media/js/hacklab.repository.js"></script>
+      <script>
+	$(function(){
+	$("#file-tree").treeview();
+	});
+      </script>
+
     </head>
     <body>
-    <div id="content" class="container_16">
-      <div class="grid_10 prefix_3 fill-form">
+      <div id="content" class="container_16">
+	<div class="grid_10 prefix_3 fill-form">
 	  <h1>${repository.name}</h1>
 	  <h2>${repository.slug}</h2>
 	  <code>
 	    git clone git://127.0.0.1/${repository.owner.username}/${repository.slug}.git
-	  </code>
-      </div><!-- end .fill-form-->
+    </code>
+    </div><!-- end .fill-form-->
     </div><!-- end #content-->
+    <div id="content" class="container_16">
+      <div class="grid_10 prefix_3 simple-corner">
+	<ul id="file-tree" class="filetree">
+	  <li><span class="folder">Folder 1</span>
+	    <ul>
+	      <li><span class="file">Item 1.1</span></li>
+	    </ul>
+	  </li>
+	  <li><span class="folder">Folder 2</span>
+	    <ul>
+	      <li><span class="folder">Subfolder 2.1</span>
+		<ul id="folder21">
+		  <li><span class="file">File 2.1.1</span></li>
+		  <li><span class="file">File 2.1.2</span></li>
+		</ul>
+	      </li>
+	      <li><span class="file">File 2.2</span></li>
+	    </ul>
+	  </li>
+	  <li class="closed"><span class="folder">Folder 3 (closed at start)</span>
+	    <ul>
+	      <li><span class="file">File 3.1</span></li>
+	    </ul>
+	  </li>
+	  <li><span class="file">File 4</span></li>
+	</ul>
+
+      </div><!-- end #file-tree -->
+    </div><!-- end #content-->
+
   </body>
 </html>

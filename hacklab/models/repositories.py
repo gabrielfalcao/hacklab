@@ -14,10 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import re
 import os
 import md5
 import sha
+import time
 import uuid
 import types
 import string
@@ -203,12 +204,43 @@ class GitRepoRepository(Repository):
         return template.make_url('/user/%s/%s' % (self.owner.username,
                                                   self.slug))
 
+    def get_dir(self):
+        return self.owner.get_repository_dir(self.slug)
+
+    def get_head(self):
+        head = self._run_sync('git rev-parse HEAD')
+        return head
+
+    def _run_sync(self, command):
+        exe = cleese.Executer(command)
+        exe.execute()
+        while not exe.poll():
+            time.sleep(0.1)
+
+        return exe.result.log.strip('\n')
+
+    def list_dir(self, dirname=None):
+        object_hash = self.get_head()
+        data = self._run_sync('git ls-tree %s' % object_hash)
+        return self.parse_data(data)
+
+    def parse_data(self, data):
+        d = {}
+        for line in data.splitlines():
+            line = re.sub(r'\s+', ' ', line)
+            mode, kind, ohash, name = line.split(" ")
+            d[name] = dict(mode=mode,
+                           type=kind,
+                           hash=ohash,
+                           name=name)
+        return d
+
     def save(self):
         if not self.slug:
             self.slug = slugify(self.name)
 
         super(GitRepoRepository, self).save()
-        repodir = self.owner.get_repository_dir(self.slug)
+        repodir = self.get_dir()
         if not self.fs.exists(repodir):
             self.fs.mkdir(repodir)
 
