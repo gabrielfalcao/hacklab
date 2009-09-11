@@ -43,5 +43,5 @@ def get_session():
     global __session__
     if not __session__:
         engine = get_engine()
-        __session__ = scoped_session(sessionmaker(bind=engine))
+        __session__ = scoped_session(sessionmaker(bind=engine, autocommit=True, autoflush=True))
     return __session__()

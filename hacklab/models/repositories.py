@@ -71,7 +71,6 @@ class Repository(object):
         session = meta.get_session()
         session.query(self.__class__).filter_by(id=self.id,
                                                 uuid=self.uuid).delete()
-        session.commit()
 
     def save(self):
         if not self.uuid:
@@ -84,8 +83,6 @@ class Repository(object):
             session.expunge(self)
 
         session.add(self)
-        session.commit()
-        session.expire(self)
 
 class UserRepository(Repository):
     class WrongPassword(Exception):
