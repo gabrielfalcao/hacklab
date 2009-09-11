@@ -56,13 +56,18 @@
 	  <div class="simple-corner">
 	    <h1>Your repositories</h1>
 	    <ul id="user-repository-list">
-	      <li py:for="x in range(10)">
-		<div class="title"><a href="/repository/${x}">Bolacha</a></div>
+	      <li class="template">
+		<div class="title"><a href=""></a></div>
 		<div class="description">last commit at
-		  <span class="time">04:29</span>
+		  <span class="time">00:00</span>
 		  by
-		  <span class="owner">Gabriel</span>
+		  <span class="owner">User Name</span>
 		</div>
+	      </li>
+
+	      <li py:for="repository in user.repositories">
+		<div class="title"><a href="${repository.get_permalink()}">${repository.name}</a></div>
+		<div class="description">no commits so far</div>
 	      </li>
 	      <li id="create-new-repos-div">
 		  <a href="#new-repos" id="create-new-repos">Create a new one</a>
