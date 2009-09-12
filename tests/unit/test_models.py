@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from hacklab import models
-from nose.tools import assert_equals
+from nose.tools import assert_equals, assert_raises
 
 def test_user_representation():
     "unicode(User()) should represent the class correctly"
@@ -34,3 +34,12 @@ def test_key_representation():
     user = models.User(username='john.doe')
     key = models.PublicKey(description='Laptop key', owner=user)
     assert_equals(unicode(key), u"<SSHPublicKey 'Laptop key' of the user 'john.doe'>")
+
+def test_get_model_fetches_model_by_name():
+    class KickAssModel(models.Model):
+        __tablename__ = 'fake'
+    assert_equals(KickAssModel, models.meta.get_model('KickAssModel'))
+
+def test_get_model_raises_when_class_does_not_exist():
+    assert_raises(models.meta.UndefinedModel,
+                  models.meta.get_model, 'NoMatchToThisModel')
