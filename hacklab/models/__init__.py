@@ -43,7 +43,7 @@ class GitRepository(Model, GitRepoRepository):
     owner = relation(User, backref=backref('repositories', order_by=name))
 
     def __unicode__(self):
-        return "<GitRepository at '%s'>" % self.path
+        return "<GitRepository at '%s'>" % self.get_dir()
 
 class PublicKey(Model, Repository):
     __tablename__ = 'ssh_public_keys'
@@ -53,5 +53,5 @@ class PublicKey(Model, Repository):
     owner = relation(User, backref=backref('keys', order_by=description))
 
     def __unicode__(self):
-        return "<SSHPublicKey at '%s'>" % self.path
+        return "<SSHPublicKey '%s' of the user '%s'>" % (self.description, self.owner.username)
 
