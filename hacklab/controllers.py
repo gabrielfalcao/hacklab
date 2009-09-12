@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import os
 import cherrypy
 import simplejson
 from sponge import route, Controller, template
@@ -108,9 +108,13 @@ class UserController(Controller):
         session = meta.get_session()
         repository = session.query(GitRepository). \
                          filter_by(name=reponame, owner=user).first()
+        if not repository:
+            return template.render_html('repository/not_found.html', {'reponame': reponame})
 
         return template.render_html('repository/page.html',
-                                    {'repository': repository})
+                                    {'repository': repository,
+                                     'os_user': os.getenv('USER'),
+                                     'local_address': cherrypy.config['server.socket_host']})
 
     @route('/new')
     def new_user(self, **data):

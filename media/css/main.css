@@ -250,13 +250,11 @@ div.form-container {
 .simple-field {
     background-color: #FFF;
     border: 1px solid #D0D1CA;
-    text-align:center;
     margin-bottom:4px;
 }
 .simple-corner {
     background-color: #FFF;
     border: 1px solid #D0D1CA;
-    text-align:center;
     margin-bottom:4px;
     -webkit-border-radius: 10px 10px;
     -moz-border-radius: 10px 10px;
@@ -431,4 +429,15 @@ ul.big-form textarea, ul.big-form .large{
 }
 #create-new-repos {
 
+}
+
+#loading {
+    margin: 0 auto;
+    width: 310px;
+    height:100px;
+    margin-top: 80px;
+}
+
+#file-tree {
+    margin: 20px 0 0 20px;
 }

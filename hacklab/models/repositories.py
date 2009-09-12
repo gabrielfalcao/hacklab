@@ -219,20 +219,26 @@ class GitRepoRepository(Repository):
 
         return exe.result.log.strip('\n')
 
-    def list_dir(self, dirname=None):
-        object_hash = self.get_head()
+    def list_dir(self, object_hash=None):
+        if not object_hash:
+            object_hash = self.get_head()
+
         data = self._run_sync('git ls-tree %s' % object_hash)
         return self.parse_data(data)
 
     def parse_data(self, data):
-        d = {}
+        d = []
         for line in data.splitlines():
             line = re.sub(r'\s+', ' ', line)
             mode, kind, ohash, name = line.split(" ")
-            d[name] = dict(mode=mode,
+            childs = kind == 'tree' and self.list_dir(ohash) or {}
+            d.append(dict(mode=mode,
+                           text=name,
+                           expanded=True,
                            type=kind,
+                           children=childs,
                            hash=ohash,
-                           name=name)
+                           name=name))
         return d
 
     def save(self):

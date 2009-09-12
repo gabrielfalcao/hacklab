@@ -9,9 +9,20 @@
       <title>${repository.owner.name}'s ${repository.name} at hacklab</title>
       <script type="text/javascript" src="/media/js/hacklab.repository.js"></script>
       <script>
-	$(function(){
-	$("#file-tree").treeview();
-	});
+     $(function(){
+	 $("#loading").ajaxStart(function (){
+	     $(this).show();
+	 });
+	 $("#loading").ajaxStop(function (){
+	     $(this).hide();
+	 });
+
+         $("#file-tree").treeview({
+	     url: "/explore/${repository.owner.username}/${repository.slug}",
+             collapsed: true,
+             animated: "fast"
+	  });
+      });
       </script>
 
     </head>
@@ -19,39 +30,19 @@
       <div id="content" class="container_16">
 	<div class="grid_10 prefix_3 fill-form">
 	  <h1>${repository.name}</h1>
-	  <h2>${repository.slug}</h2>
-	  <code>
-	    git clone git://127.0.0.1/${repository.owner.username}/${repository.slug}.git
-    </code>
+	  <div class="simple-corner" style="text-align:center;">
+	      <code>
+		git clone git://127.0.0.1/${repository.owner.username}/${repository.slug}.git
+		git push ${os_user}@${local_address}/${repository.owner.username}/${repository.slug}.git
+	      </code>
+	</div>
     </div><!-- end .fill-form-->
     </div><!-- end #content-->
     <div id="content" class="container_16">
-      <div class="grid_10 prefix_3 simple-corner">
+      <div class="grid_16 simple-corner">
+	<div id="loading">Loading tree...<img src="/media/img/loader.gif" /></div>
 	<ul id="file-tree" class="filetree">
-	  <li><span class="folder">Folder 1</span>
-	    <ul>
-	      <li><span class="file">Item 1.1</span></li>
-	    </ul>
-	  </li>
-	  <li><span class="folder">Folder 2</span>
-	    <ul>
-	      <li><span class="folder">Subfolder 2.1</span>
-		<ul id="folder21">
-		  <li><span class="file">File 2.1.1</span></li>
-		  <li><span class="file">File 2.1.2</span></li>
-		</ul>
-	      </li>
-	      <li><span class="file">File 2.2</span></li>
-	    </ul>
-	  </li>
-	  <li class="closed"><span class="folder">Folder 3 (closed at start)</span>
-	    <ul>
-	      <li><span class="file">File 3.1</span></li>
-	    </ul>
-	  </li>
-	  <li><span class="file">File 4</span></li>
 	</ul>
-
       </div><!-- end #file-tree -->
     </div><!-- end #content-->
 

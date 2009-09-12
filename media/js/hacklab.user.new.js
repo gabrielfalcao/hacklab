@@ -2,8 +2,7 @@ $(function (){
       $("#new-user-form").validate({
             rules: {
                 name: {
-                    required: true,
-                    minlength: 5
+                    required: true
                 },
                 username: {
                     required: true,
