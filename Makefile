@@ -6,6 +6,8 @@ all:
 clear:
 	@echo "Cleaning up files..."
 	@find . -name '*.pyc' -exec rm -rf {} \;
+	@find . -name '*~' -exec rm -f {} \;
+	@rm -f gitdaemon.pid
 	@echo "Cleaning up repositories..."
 	@rm -rf repositories
 	@echo "Cleaning up database file..."
