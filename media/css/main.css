@@ -259,6 +259,9 @@ div.form-container {
     -webkit-border-radius: 10px 10px;
     -moz-border-radius: 10px 10px;
 }
+.simple-corner code {
+    display:block;
+}
 .simple-corner h1 {
     color:#888a85;
     font-size: 20px;
@@ -441,3 +444,8 @@ ul.big-form textarea, ul.big-form .large{
 #file-tree {
     margin: 20px 0 0 20px;
 }
+
+#account-details {
+    text-align:center;
+}
+
