@@ -68,6 +68,15 @@ class Repository(object):
         return items
 
     @classmethod
+    def get_by(cls, **kw):
+        return cls.fetch_by(**kw).first()
+
+    @classmethod
+    def fetch_by(cls, **kw):
+        session = meta.get_session()
+        return session.query(cls).filter_by(**kw)
+
+    @classmethod
     def create(cls, **kwargs):
         instance = cls()
         for k,v in kwargs.items():

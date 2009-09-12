@@ -23,43 +23,26 @@ def test_delete_key():
     "delete_key() fetches user from db and delete"
     mocker = Mox()
 
-    mocker.StubOutWithMock(controllers, 'meta')
     mocker.StubOutWithMock(controllers, 'models')
     mocker.StubOutWithMock(controllers, 'cherrypy')
-
-    controllers.cherrypy.session = {'user_id': 'should-be-user-id'}
-    controllers.models.PublicKey = 'should-be-public-key'
-    controllers.models.User = 'should-be-user'
 
     user_mock = mocker.CreateMockAnything()
     key_mock = mocker.CreateMockAnything()
     key_mock.as_dict().AndReturn(dict(should_be='a dict'))
     key_mock.delete()
 
-    session_mock = mocker.CreateMockAnything()
+    controllers.cherrypy.session = {'user_id': 'should-be-user-id'}
 
-    session_mock.query(controllers.models.User). \
-        AndReturn(session_mock)
-    session_mock.filter_by(id='should-be-user-id'). \
-        AndReturn(session_mock)
-    session_mock.first().AndReturn(user_mock)
+    controllers.models.User = mocker.CreateMockAnything()
+    controllers.models.PublicKey = mocker.CreateMockAnything()
 
-    session_mock.query(controllers.models.PublicKey). \
-        AndReturn(session_mock)
-
-    session_mock.filter_by(uuid='should-be-uuid'). \
-        AndReturn(session_mock)
-
-    session_mock.first().AndReturn(key_mock)
-    controllers.meta.get_session(). \
-        AndReturn(session_mock)
-    controllers.meta.get_session(). \
-        AndReturn(session_mock)
+    controllers.models.User.get_by(id='should-be-user-id').AndReturn(user_mock)
+    controllers.models.PublicKey.get_by(uuid='should-be-key-uuid').AndReturn(key_mock)
 
     ctrl = controllers.UserController()
     mocker.ReplayAll()
     try:
-        got = ctrl.delete_key(uuid='should-be-uuid')
+        got = ctrl.delete_key(uuid='should-be-key-uuid')
         assert_equals(got, '{"should_be": "a dict"}')
         mocker.VerifyAll()
     finally:

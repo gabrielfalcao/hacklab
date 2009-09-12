@@ -19,18 +19,13 @@ import cherrypy
 import simplejson
 from sponge import route, Controller, template
 from hacklab import models
-from hacklab.models import meta
 from sqlalchemy.exc import IntegrityError
 
 def authenticated_route(path, name=None, login_at='/login'):
     def decor(func):
         def wrap(self, *args, **kw):
-            session = meta.get_session()
             user_id = cherrypy.session.get('user_id')
-            user = None
-            if user_id:
-                user = session.query(models.User). \
-                       filter_by(id=user_id).first()
+            user = models.User.get_by(id=user_id)
 
             if user:
                 return func(self, user=user, *args, **kw)
@@ -70,9 +65,7 @@ def contains_all(data, *params):
 class UserController(Controller):
     @authenticated_route('/key/:uuid/delete')
     def delete_key(self, user, uuid, **data):
-        session = meta.get_session()
-        key = session.query(models.PublicKey). \
-              filter_by(uuid=uuid).first()
+        key = models.PublicKey.get_by(uuid=uuid)
         d = key.as_dict()
         key.delete()
         return json_response(d)
@@ -104,9 +97,7 @@ class UserController(Controller):
 
     @authenticated_route('/:username/:reponame')
     def repository_page(self, user, username, reponame, **data):
-        session = meta.get_session()
-        repository = session.query(models.GitRepository). \
-                         filter_by(name=reponame, owner=user).first()
+        repository = models.GitRepository.get_by(name=reponame, owner=user)
         if not repository:
             return template.render_html('repository/not_found.html', {'reponame': reponame})
 
@@ -154,15 +145,13 @@ class HackLabController(Controller):
         path = path.split("/")
         reponame = path.pop(0)
 
-        session = meta.get_session()
-        user = session.query(models.User).filter_by(username=username).first()
+        user = models.User.get_by(username=username)
         if not user:
             cherrypy.response.status = 404
             return template.render_html('user/not_found.html',
                                         {'username': username})
 
-        repo = session.query(models.GitRepository). \
-               filter_by(owner=user, name=reponame).first()
+        repo = models.GitRepository.get_by(owner=user, name=reponame)
         if not repo:
             cherrypy.response.status = 404
             return template.render_html('repository/not_found.html',
