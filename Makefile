@@ -16,7 +16,7 @@ db: clear
 	@echo "Creating database ..."
 	@python -c 'import db;db.create_all()'
 
-run:
+run: db
 	@echo "Running bob builtin server..."
 	@bob go
 
