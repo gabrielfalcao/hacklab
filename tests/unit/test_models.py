@@ -36,10 +36,12 @@ def test_key_representation():
     assert_equals(unicode(key), u"<SSHPublicKey 'Laptop key' of the user 'john.doe'>")
 
 def test_get_model_fetches_model_by_name():
+    "meta.get_model() returns the respective model class"
     class KickAssModel(models.Model):
         __tablename__ = 'fake'
     assert_equals(KickAssModel, models.meta.get_model('KickAssModel'))
 
 def test_get_model_raises_when_class_does_not_exist():
+    "meta.get_model() raises UndefinedModel exception, when not found"
     assert_raises(models.meta.UndefinedModel,
                   models.meta.get_model, 'NoMatchToThisModel')

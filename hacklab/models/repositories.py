@@ -20,7 +20,6 @@ import md5
 import sha
 import time
 import uuid
-import types
 import string
 import shutil
 import cleese
@@ -42,6 +41,16 @@ ENTRY_TEMPLATE = string.Template(u'command="hacklab-verify ${repos}",' \
 class ObjectNotFound(Exception):
     pass
 
+def serializable(func_or_name=None):
+    if isinstance(func_or_name, basestring):
+        def wrap(func):
+            func.serializable = func_or_name
+            return func
+        return wrap
+
+    func_or_name.serializable = func_or_name.__name__
+    return func_or_name
+
 class Repository(object):
     NotFound = ObjectNotFound
     fs = FileSystem()
@@ -55,12 +64,8 @@ class Repository(object):
             attr = getattr(self, attrname)
             if isinstance(attr, (basestring, int, float)):
                 items[attrname] = attr
-            if isinstance(attr, types.MethodType) and \
-                   attrname.startswith('get_'):
-                try:
-                    items[attrname] = apply(attr)
-                except TypeError, e:
-                    items[attrname] = None
+            if hasattr(attr, 'serializable'):
+                items[attr.serializable] = apply(attr)
 
             if isinstance(attr, list):
                 items[attrname] = [x.as_dict() for x in attr]
@@ -122,6 +127,7 @@ class UserRepository(Repository):
 
         return repo
 
+    @serializable
     def get_repository_dir(self, name=''):
         root = cherrypy.config['sponge.root']
         repo_dir = cherrypy.config['sponge.extra']['repositories-dir']
@@ -132,6 +138,7 @@ class UserRepository(Repository):
             return self.fs.join(base, "%s.git" % name)
         return base
 
+    @serializable
     def get_gravatar(self):
         md5_email = md5.new(self.email).hexdigest()
         return 'http://www.gravatar.com/avatar/%s.jpg' % md5_email
@@ -142,6 +149,7 @@ class UserRepository(Repository):
         return u"hash:%s" % sha.new(base).hexdigest()
 
     @property
+    @serializable
     def total_of_repositories(self):
         cls = meta.get_model('GitRepository')
         session = meta.get_session()
@@ -149,6 +157,7 @@ class UserRepository(Repository):
         return total
 
     @property
+    @serializable
     def total_of_keys(self):
         cls = meta.get_model('PublicKey')
         session = meta.get_session()
@@ -203,10 +212,11 @@ class UserRepository(Repository):
         os.remove(temp_filename)
 
 class GitRepoRepository(Repository):
+    @serializable
     def get_permalink(self):
         return template.make_url('/user/%s/%s' % (self.owner.username,
                                                   self.slug))
-
+    @serializable
     def get_dir(self):
         return self.owner.get_repository_dir(self.slug)
 

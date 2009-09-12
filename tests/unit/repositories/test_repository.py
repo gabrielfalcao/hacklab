@@ -123,3 +123,55 @@ def test_repository_save_doesnt_touch():
     finally:
         rep.meta = old_meta
 
+def test_as_dict_does_serialize_strings_and_numbers():
+    "Repository.as_dict() serializes string, int and float attributes"
+    class Person(rep.Repository):
+        name = "some name"
+        weight = 10.3
+        age = 20
+
+    p = Person()
+
+    got = p.as_dict()
+    assert_equals(got, {'age': 20,
+                        'name': 'some name',
+                        'weight': 10.300000000000001})
+
+def test_as_dict_also_serializes_serializable_methods():
+    "Repository.as_dict() also serializes @serializable methods"
+    class Person(rep.Repository):
+        name = "some name"
+        age = 20
+        @rep.serializable
+        def get_parents(self):
+            return ['dad', 'mom']
+
+    def calculate_salary(self):
+        return 5000
+
+    p = Person()
+
+    got = p.as_dict()
+    assert_equals(got, {'age': 20,
+                        'name': 'some name',
+                        'get_parents': ['dad', 'mom']})
+
+
+def test_as_dict_with_named_serializables():
+    "Repository.as_dict() used the optional name from @serializable"
+    class Person(rep.Repository):
+        name = "some name"
+        age = 20
+        @rep.serializable('my_parents')
+        def get_parents(self):
+            return ['dad', 'mom']
+
+    def calculate_salary(self):
+        return 5000
+
+    p = Person()
+
+    got = p.as_dict()
+    assert_equals(got, {'age': 20,
+                        'name': 'some name',
+                        'my_parents': ['dad', 'mom']})
