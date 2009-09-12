@@ -16,9 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import cherrypy
 from mox import Mox
-from nose.tools import with_setup
 from nose.tools import assert_equals
-from nose.tools import assert_raises
 from hacklab.models import repositories as rep
 
 old_config = {}
@@ -158,3 +156,31 @@ def test_save_if_repo_dir_already_exists():
         mocker.VerifyAll()
     finally:
         mocker.UnsetStubs()
+
+def test_run_sync():
+    "GitRepoRepository()._run_sync() runs command and waits to finish."
+    mocker = Mox()
+    mocker.StubOutWithMock(rep, 'cleese')
+    mocker.StubOutWithMock(rep, 'time')
+
+    exe_mock = mocker.CreateMockAnything()
+    exe_mock.result = mocker.CreateMockAnything()
+    exe_mock.result.log = "\nshould be command result\n"
+
+    exe_mock.execute()
+    exe_mock.poll().AndReturn(False)
+    exe_mock.poll().AndReturn(False)
+    exe_mock.poll().AndReturn(False)
+    exe_mock.poll().AndReturn(True)
+
+    rep.time.sleep(0.1)
+    rep.time.sleep(0.1)
+    rep.time.sleep(0.1)
+
+    rep.cleese.Executer('should-be-command').AndReturn(exe_mock)
+    mocker.ReplayAll()
+    try:
+        got = rep.GitRepoRepository()._run_sync('should-be-command')
+        assert_equals(got, 'should be command result')
+    finally:
+        mocker.VerifyAll()
