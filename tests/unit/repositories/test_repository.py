@@ -90,10 +90,7 @@ def test_repository_save_adds_uuid():
 
     model = ModelStub()
 
-    session_mock.object_session(model).AndReturn(False)
     session_mock.add(model)
-    session_mock.commit()
-    session_mock.expire(model)
 
     mocker.ReplayAll()
     try:
@@ -116,10 +113,7 @@ def test_repository_save_doesnt_touch():
         uuid = 'my-uuid'
 
     model = ModelStub()
-    session_mock.object_session(model).AndReturn(False)
     session_mock.add(model)
-    session_mock.commit()
-    session_mock.expire(model)
 
     mocker.ReplayAll()
     try:
@@ -129,56 +123,3 @@ def test_repository_save_doesnt_touch():
     finally:
         rep.meta = old_meta
 
-def test_repository_save_adds_object_to_session_and_commits():
-    "Repository.save() should set add object to session, and commit."
-
-    mocker = Mox()
-    mocker.StubOutWithMock(rep, 'meta')
-
-    class ModelStub(rep.Repository):
-        uuid = None
-
-    model = ModelStub()
-
-    session_mock = mocker.CreateMockAnything()
-    session_mock.object_session(model).AndReturn(False)
-    session_mock.add(model)
-    session_mock.commit()
-    session_mock.expire(model)
-    rep.meta.get_session().AndReturn(session_mock)
-
-    mocker.ReplayAll()
-    try:
-        model.save()
-        mocker.VerifyAll()
-    finally:
-        mocker.UnsetStubs()
-
-def test_repository_delete_does_commit():
-    "Repository.delete() should delete object and commit session."
-
-    mocker = Mox()
-    mocker.StubOutWithMock(rep, 'meta')
-
-    class ModelStub(rep.Repository):
-        id = 'should-be-id'
-        uuid = 'should-be-uuid'
-
-    model = ModelStub()
-
-    query_mock = mocker.CreateMockAnything()
-    query_mock.filter_by(id='should-be-id',
-                         uuid='should-be-uuid').AndReturn(query_mock)
-    query_mock.delete()
-
-    session_mock = mocker.CreateMockAnything()
-    session_mock.query(ModelStub).AndReturn(query_mock)
-    session_mock.commit()
-
-    rep.meta.get_session().AndReturn(session_mock)
-    mocker.ReplayAll()
-    try:
-        model.delete()
-        mocker.VerifyAll()
-    finally:
-        mocker.UnsetStubs()

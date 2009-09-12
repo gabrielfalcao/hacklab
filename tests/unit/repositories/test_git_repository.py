@@ -91,12 +91,7 @@ def test_save_if_repo_dir_does_not_exist():
 
     rep.uuid.uuid4().AndReturn('should-be-a-new-uuid')
     session_mock = mocker.CreateMockAnything()
-    session_mock.object_session(git).AndReturn(True)
-    session_mock.object_session(git).AndReturn(session_mock)
-    session_mock.expunge(git)
     session_mock.add(git)
-    session_mock.commit()
-    session_mock.expire(git)
     rep.meta.get_session().AndReturn(session_mock)
 
     fs_mock.pushd('should-be-repo-dir')
@@ -144,12 +139,7 @@ def test_save_if_repo_dir_already_exists():
 
     rep.uuid.uuid4().AndReturn('should-be-a-new-uuid')
     session_mock = mocker.CreateMockAnything()
-    session_mock.object_session(git).AndReturn(True)
-    session_mock.object_session(git).AndReturn(session_mock)
-    session_mock.expunge(git)
     session_mock.add(git)
-    session_mock.commit()
-    session_mock.expire(git)
     rep.meta.get_session().AndReturn(session_mock)
 
     fs_mock.mkdir('should-be-repo-dir')

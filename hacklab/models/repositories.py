@@ -78,19 +78,13 @@ class Repository(object):
 
     def delete(self):
         session = meta.get_session()
-        session.query(self.__class__).filter_by(id=self.id,
-                                                uuid=self.uuid).delete()
+        session.delete(self)
 
     def save(self):
         if not self.uuid:
             self.uuid = unicode(uuid.uuid4())
 
         session = meta.get_session()
-
-        if session.object_session(self):
-            session = session.object_session(self)
-            session.expunge(self)
-
         session.add(self)
 
 class UserRepository(Repository):

@@ -18,9 +18,7 @@ import os
 import cherrypy
 import simplejson
 from sponge import route, Controller, template
-from hacklab.models import User
-from hacklab.models import GitRepository
-from hacklab.models import PublicKey
+from hacklab import models
 from hacklab.models import meta
 from sqlalchemy.exc import IntegrityError
 
@@ -31,7 +29,8 @@ def authenticated_route(path, name=None, login_at='/login'):
             user_id = cherrypy.session.get('user_id')
             user = None
             if user_id:
-                user = session.query(User).filter_by(id=user_id).first()
+                user = session.query(models.User). \
+                       filter_by(id=user_id).first()
 
             if user:
                 return func(self, user=user, *args, **kw)
@@ -72,7 +71,7 @@ class UserController(Controller):
     @authenticated_route('/key/:uuid/delete')
     def delete_key(self, user, uuid, **data):
         session = meta.get_session()
-        key = session.query(PublicKey). \
+        key = session.query(models.PublicKey). \
               filter_by(uuid=uuid).first()
         d = key.as_dict()
         key.delete()
@@ -106,7 +105,7 @@ class UserController(Controller):
     @authenticated_route('/:username/:reponame')
     def repository_page(self, user, username, reponame, **data):
         session = meta.get_session()
-        repository = session.query(GitRepository). \
+        repository = session.query(models.GitRepository). \
                          filter_by(name=reponame, owner=user).first()
         if not repository:
             return template.render_html('repository/not_found.html', {'reponame': reponame})
@@ -133,7 +132,7 @@ class UserController(Controller):
 
         if not needed.difference(set(data.keys())):
             try:
-                user = User.create(**data)
+                user = models.User.create(**data)
                 cherrypy.session['user_id'] = user.id
                 raise cherrypy.HTTPRedirect('/user/account')
 
@@ -156,13 +155,13 @@ class HackLabController(Controller):
         reponame = path.pop(0)
 
         session = meta.get_session()
-        user = session.query(User).filter_by(username=username).first()
+        user = session.query(models.User).filter_by(username=username).first()
         if not user:
             cherrypy.response.status = 404
             return template.render_html('user/not_found.html',
                                         {'username': username})
 
-        repo = session.query(GitRepository). \
+        repo = session.query(models.GitRepository). \
                filter_by(owner=user, name=reponame).first()
         if not repo:
             cherrypy.response.status = 404
@@ -211,14 +210,14 @@ class HackLabController(Controller):
 
         if email and password:
             try:
-                user = User.authenticate(email, password)
+                user = models.User.authenticate(email, password)
                 cherrypy.session['user_id'] = user.id
                 raise cherrypy.HTTPRedirect(redirect_to)
 
-            except User.NotFound, e:
+            except models.User.NotFound, e:
                 context['not_registered'] = unicode(email)
 
-            except User.WrongPassword, e:
+            except models.User.WrongPassword, e:
                 context['wrong_password'] = unicode(e)
 
         return template.render_html('user/login.html', context)
