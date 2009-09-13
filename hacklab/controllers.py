@@ -43,6 +43,10 @@ def json_response(data):
     cherrypy.response.headers['Content-Type'] = 'text/plain'
     return simplejson.dumps(data)
 
+def plain_response(data):
+    cherrypy.response.headers['Content-Type'] = 'text/plain'
+    return data
+
 def ajax_error(message, details=None):
     d = {'error': message,
          'details': details}
@@ -107,8 +111,10 @@ class UserController(Controller):
             ohash = path[-1]
             if path[0] == 'tree':
                 files = repository.list_dir(ohash)
+
             elif path[0] == 'blob':
                 raw = repository.get_blob(ohash)
+                return plain_response(raw)
         else:
             files = repository.list_dir()
 
