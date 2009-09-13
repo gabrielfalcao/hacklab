@@ -100,6 +100,7 @@ class Repository(object):
 
         session = meta.get_session()
         session.add(self)
+        session.flush()
 
 class UserRepository(Repository):
     class WrongPassword(Exception):

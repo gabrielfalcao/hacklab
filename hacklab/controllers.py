@@ -188,17 +188,6 @@ class HackLabController(Controller):
     def index(self):
         raise cherrypy.HTTPRedirect('/login')
 
-    @authenticated_route('/repository/new')
-    def new_repository(self, user, **kw):
-        if contains_all(kw, 'name'):
-            name = kw['name']
-            description = kw.get('description', '')
-            repository = user.create_repository(name=name,
-                                                description=description)
-            raise cherrypy.HTTPRedirect(repository.get_permalink())
-
-        return template.render_html('repository/new.html', {'user': user})
-
     @authenticated_route('/repository/new/ajax')
     def new_repository_ajax(self, user, **kw):
         if contains_all(kw, 'name'):
@@ -206,6 +195,9 @@ class HackLabController(Controller):
             description = kw.get('description', '')
             repository = user.create_repository(name=name,
                                                 description=description)
+            if not repository.id:
+                return ajax_error('could not create the repository')
+
             return json_response(repository.as_dict())
 
         return ajax_error('missing repository name')
