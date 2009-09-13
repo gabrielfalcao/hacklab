@@ -95,14 +95,30 @@ class UserController(Controller):
     def manage_account(self, user, **data):
         return template.render_html('user/account.html', {'user': user})
 
-    @authenticated_route('/:username/:reponame')
-    def repository_page(self, user, username, reponame, **data):
-        repository = models.GitRepository.get_by(name=reponame, owner=user)
+    @authenticated_route('/:username/*(path)')
+    def repository_page(self, user, username, path, **data):
+        path = path.split("/")
+        reponame = path.pop(0)
+        files = []
+        repository = models.GitRepository.get_by(name=reponame,
+                                                 owner=user)
+        raw = None
+        if len(path) == 2 and len(path[-1]) == 40:
+            ohash = path[-1]
+            if path[0] == 'tree':
+                files = repository.list_dir(ohash)
+            elif path[0] == 'blob':
+                raw = repository.get_blob(ohash)
+        else:
+            files = repository.list_dir()
+
         if not repository:
             return template.render_html('repository/not_found.html', {'reponame': reponame})
 
         return template.render_html('repository/page.html',
                                     {'repository': repository,
+                                     'files': files,
+                                     'raw': raw,
                                      'os_user': os.getenv('USER'),
                                      'local_address': cherrypy.config['server.socket_host']})
 
@@ -142,8 +158,6 @@ class UserController(Controller):
 class HackLabController(Controller):
     @route('/explore/:username/*(path)')
     def explore(self, username, path, **data):
-        path = path.split("/")
-        reponame = path.pop(0)
 
         user = models.User.get_by(username=username)
         if not user:

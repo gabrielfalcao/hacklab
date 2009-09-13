@@ -220,10 +220,6 @@ class GitRepoRepository(Repository):
     def get_dir(self):
         return self.owner.get_repository_dir(self.slug)
 
-    def get_head(self):
-        head = self._run_sync('git rev-parse HEAD')
-        return head
-
     def _run_sync(self, command):
         exe = cleese.Executer(command)
         exe.execute()
@@ -232,26 +228,33 @@ class GitRepoRepository(Repository):
 
         return exe.result.log.strip('\n')
 
-    def list_dir(self, object_hash=None):
-        if not object_hash:
-            object_hash = self.get_head()
-
+    def list_dir(self, object_hash='HEAD', parent=None):
         data = self._run_sync('git ls-tree %s' % object_hash)
-        return self.parse_data(data)
+        return self.parse_data(data, parent=parent)
 
-    def parse_data(self, data):
+    def get_blob(self, object_hash):
+        data = self._run_sync('git show %s' % object_hash)
+        return data
+
+
+    def parse_data(self, data, parent=None):
         d = []
         for line in data.splitlines():
             line = re.sub(r'\s+', ' ', line)
             mode, kind, ohash, name = line.split(" ")
-            childs = kind == 'tree' and self.list_dir(ohash) or {}
+            childs = kind == 'tree' and self.list_dir(ohash, parent=name) or {}
+            if parent:
+                url = os.path.join(parent, kind, name)
+            else:
+                url = os.path.join(kind, name)
+
             d.append(dict(mode=mode,
-                           text=name,
-                           expanded=True,
-                           type=kind,
-                           children=childs,
-                           hash=ohash,
-                           name=name))
+                          url=url,
+                          parent_name=parent,
+                          type=kind,
+                          children=childs,
+                          hash=ohash,
+                          name=name))
         return d
 
     def save(self):
