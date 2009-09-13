@@ -15,14 +15,17 @@
 	  <h1>${repository.name}</h1>
 	  <div class="simple-corner" style="text-align:center;">
 	    <code>git clone git://127.0.0.1/${repository.owner.username}/${repository.slug}.git</code>
-      <code>git push ${os_user}@${local_address}/${repository.owner.username}/${repository.slug}.git</code>
+      <code>git push ${os_user}@${local_address}:${repository.get_dir()}</code>
     </div>
     </div><!-- end .fill-form-->
     </div><!-- end #content-->
     <div id="content" class="container_16">
       <div class="grid_16 simple-corner">
+	<div class="message" py:if="not raw and not files">
+	  <p>No files were pushed yet</p>
+	</div>
 	<code py:if="raw">${raw}</code>
-	<table cellspacing="0" cellpadding="0" py:if="defined('files')">
+	<table cellspacing="0" cellpadding="0" py:if="files">
 	  <tbody><tr>
 	      <th/>
 	      <th>name</th>

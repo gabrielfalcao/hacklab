@@ -104,8 +104,13 @@ class UserController(Controller):
         path = path.split("/")
         reponame = path.pop(0)
         files = []
+
         repository = models.GitRepository.get_by(name=reponame,
                                                  owner=user)
+        if not repository:
+            return template.render_html('repository/not_found.html',
+                                        {'reponame': reponame})
+
         raw = None
         if len(path) == 2 and len(path[-1]) == 40:
             ohash = path[-1]
@@ -118,15 +123,14 @@ class UserController(Controller):
         else:
             files = repository.list_dir()
 
-        if not repository:
-            return template.render_html('repository/not_found.html', {'reponame': reponame})
 
+        localhost = cherrypy.config['server.socket_host']
         return template.render_html('repository/page.html',
                                     {'repository': repository,
                                      'files': files,
                                      'raw': raw,
                                      'os_user': os.getenv('USER'),
-                                     'local_address': cherrypy.config['server.socket_host']})
+                                     'local_address': localhost})
 
     @route('/new')
     def new_user(self, **data):

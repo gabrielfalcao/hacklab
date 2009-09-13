@@ -229,20 +229,28 @@ class GitRepoRepository(Repository):
         return exe.result.log.strip('\n')
 
     def list_dir(self, object_hash='HEAD', parent=None):
+        self.fs.pushd(self.get_dir())
         data = self._run_sync('git ls-tree %s' % object_hash)
-        return self.parse_data(data, parent=parent)
+        self.fs.popd()
+        try:
+            parsed = self.parse_data(data, parent=parent)
+        except ValueError, e:
+            parsed = {}
+
+        return parsed
 
     def get_blob(self, object_hash):
         data = self._run_sync('git show %s' % object_hash)
         return data
-
 
     def parse_data(self, data, parent=None):
         d = []
         for line in data.splitlines():
             line = re.sub(r'\s+', ' ', line)
             mode, kind, ohash, name = line.split(" ")
-            childs = kind == 'tree' and self.list_dir(ohash, parent=name) or {}
+            childs = kind == 'tree' and \
+                     self.list_dir(ohash, parent=name) or {}
+
             if parent:
                 url = os.path.join(parent, kind, name)
             else:
@@ -267,7 +275,5 @@ class GitRepoRepository(Repository):
             self.fs.mkdir(repodir)
 
         self.fs.pushd(repodir)
-        exe = cleese.Executer('git init --bare')
-        exe.execute()
-
+        self._run_sync('git init --bare')
         self.fs.popd()
