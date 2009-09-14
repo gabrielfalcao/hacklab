@@ -91,6 +91,7 @@ def test_repository_save_adds_uuid():
     model = ModelStub()
 
     session_mock.add(model)
+    session_mock.flush()
 
     mocker.ReplayAll()
     try:
@@ -114,6 +115,7 @@ def test_repository_save_doesnt_touch():
 
     model = ModelStub()
     session_mock.add(model)
+    session_mock.flush()
 
     mocker.ReplayAll()
     try:

@@ -218,6 +218,7 @@ def test_save_hashes_password_if_does_not_start_with_hash():
 
     session_mock = mocker.CreateMockAnything()
     session_mock.add(user)
+    session_mock.flush()
 
     rep.meta.get_session().AndReturn(session_mock)
 
@@ -252,6 +253,7 @@ def test_save_doesnt_touch_password_if_already_hashed():
 
     session_mock = mocker.CreateMockAnything()
     session_mock.add(user)
+    session_mock.flush()
 
     rep.meta.get_session().AndReturn(session_mock)
 
@@ -287,6 +289,7 @@ def test_save_should_create_user_repo_dir():
 
     session_mock = mocker.CreateMockAnything()
     session_mock.add(user)
+    session_mock.flush()
 
     rep.meta.get_session().AndReturn(session_mock)
 

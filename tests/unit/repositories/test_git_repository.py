@@ -77,6 +77,7 @@ def test_save_if_repo_dir_does_not_exist():
         slug = None
         owner = owner_mock
         fs = fs_mock
+        _run_sync = mocker.CreateMockAnything()
 
     git = GitRepoStub()
 
@@ -90,16 +91,13 @@ def test_save_if_repo_dir_does_not_exist():
     rep.uuid.uuid4().AndReturn('should-be-a-new-uuid')
     session_mock = mocker.CreateMockAnything()
     session_mock.add(git)
+    session_mock.flush()
     rep.meta.get_session().AndReturn(session_mock)
 
     fs_mock.pushd('should-be-repo-dir')
     fs_mock.popd()
 
-    executer_mock = mocker.CreateMockAnything()
-    executer_mock.execute()
-
-    rep.cleese.Executer('git init --bare'). \
-        AndReturn(executer_mock)
+    git._run_sync('git init --bare')
 
     mocker.ReplayAll()
     try:
@@ -125,6 +123,7 @@ def test_save_if_repo_dir_already_exists():
         slug = None
         owner = owner_mock
         fs = fs_mock
+        _run_sync = mocker.CreateMockAnything()
 
     git = GitRepoStub()
 
@@ -138,18 +137,14 @@ def test_save_if_repo_dir_already_exists():
     rep.uuid.uuid4().AndReturn('should-be-a-new-uuid')
     session_mock = mocker.CreateMockAnything()
     session_mock.add(git)
+    session_mock.flush()
     rep.meta.get_session().AndReturn(session_mock)
 
     fs_mock.mkdir('should-be-repo-dir')
     fs_mock.pushd('should-be-repo-dir')
     fs_mock.popd()
 
-    executer_mock = mocker.CreateMockAnything()
-    executer_mock.execute()
-
-    rep.cleese.Executer('git init --bare'). \
-        AndReturn(executer_mock)
-
+    git._run_sync('git init --bare')
     mocker.ReplayAll()
     try:
         git.save()
