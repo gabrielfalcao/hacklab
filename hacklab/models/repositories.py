@@ -241,7 +241,10 @@ class GitRepoRepository(Repository):
         return parsed
 
     def get_blob(self, object_hash):
+        self.fs.pushd(self.get_dir())
+        self._run_sync('git update-server-info')
         data = self._run_sync('git show %s' % object_hash)
+        self.fs.popd()
         return data
 
     def parse_data(self, data, parent=None):

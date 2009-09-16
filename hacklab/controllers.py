@@ -99,12 +99,13 @@ class UserController(Controller):
     def manage_account(self, user, **data):
         return template.render_html('user/account.html', {'user': user})
 
-    @authenticated_route('/:username/*(path)')
-    def repository_page(self, user, username, path, **data):
+    @route('/:username/*(path)')
+    def repository_page(self, username, path, **data):
         path = path.split("/")
         reponame = path.pop(0)
         files = []
 
+        user = models.User.get_by(username=username)
         repository = models.GitRepository.get_by(name=reponame,
                                                  owner=user)
         if not repository:
