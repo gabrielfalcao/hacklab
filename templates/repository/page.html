@@ -8,6 +8,9 @@
     <head>
       <title>${repository.owner.name}'s ${repository.name} at hacklab</title>
       <script type="text/javascript" src="/media/js/hacklab.repository.js"></script>
+      <style type="text/css" media="screen">
+      ${Markup(style)}
+      </style>
     </head>
     <body>
       <div id="content" class="container_16">
@@ -21,10 +24,10 @@
     </div><!-- end #content-->
     <div id="content" class="container_16">
       <div class="grid_16 simple-corner">
-	<div class="message" py:if="not raw and not files">
+	<div class="message" py:if="not code and not files">
 	  <p>No files were pushed yet</p>
 	</div>
-	<code py:if="raw">${raw}</code>
+	<code py:if="code">${Markup(code)}</code>
 	<table cellspacing="0" cellpadding="0" py:if="files">
 	  <tbody><tr>
 	      <th/>

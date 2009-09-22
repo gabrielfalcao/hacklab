@@ -17,6 +17,9 @@
 import os
 import cherrypy
 import simplejson
+import pygments
+from pygments import lexers
+from pygments import formatters
 from sponge import route, Controller, template
 from hacklab import models
 from sqlalchemy.exc import IntegrityError
@@ -112,7 +115,7 @@ class UserController(Controller):
             return template.render_html('repository/not_found.html',
                                         {'reponame': reponame})
 
-        raw = None
+        code = style = ""
         if len(path) == 2 and len(path[-1]) == 40:
             ohash = path[-1]
             if path[0] == 'tree':
@@ -120,7 +123,14 @@ class UserController(Controller):
 
             elif path[0] == 'blob':
                 raw = repository.get_blob(ohash)
-                return plain_response(raw)
+                try:
+                    lexer = lexers.guess_lexer(raw)
+                except ValueError:
+                    lexer = lexers.TextLexer()
+
+                formatter = pygments.formatters.HtmlFormatter(style='colorful')
+                code = pygments.highlight(raw, lexer, formatter)
+                style = formatter.get_style_defs()
         else:
             files = repository.list_dir()
 
@@ -129,7 +139,8 @@ class UserController(Controller):
         return template.render_html('repository/page.html',
                                     {'repository': repository,
                                      'files': files,
-                                     'raw': raw,
+                                     'code': code,
+                                     'style': style,
                                      'os_user': os.getenv('USER'),
                                      'local_address': localhost})
 
